@@ -222,14 +222,5 @@ class AppDelegate: UIResponder, UIApplicationDelegate, ObservableObject {
         )
     }
     
-    func test_burn_out() {
-        // used to test burn out in background mode and go into suspenison
-        //                for n in 1...20 {
-        //                    //let x = n * n
-        //                    let second: Double = 1000000
-        //                    usleep(useconds_t(0.900 * second)) //will sleep for n milliseconds
-        //                    StatsLoader.instance.load_stats()
-        //                }
-    }
 }
 

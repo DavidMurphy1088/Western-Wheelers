@@ -102,7 +102,7 @@ struct RideJoinView: View {
         }
         else {
             if status == Ride.ActiveStatus.Active {
-                return Color .green
+                return Color .blue
             }
             else {
                 return Color .black

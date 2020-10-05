@@ -167,7 +167,8 @@ struct PeopleListView: View {
                             .padding()
                             //only enabled if user has profile
                             //also check current user in case they they
-                            .disabled(UserModel.userModel.fetchedUser == nil)
+                            .disabled(UserModel.userModel.fetchedUser == nil ||
+                                        UserModel.userModel.fetchedUser?.email != UserModel.userModel.currentUser?.email)
                             //.hiddenNavigationBarStyle()
 
                             Button(action: {

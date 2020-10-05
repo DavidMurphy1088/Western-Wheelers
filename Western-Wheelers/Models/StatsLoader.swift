@@ -33,7 +33,7 @@ class StatsLoader: ObservableObject {
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             
             if error != nil {
-                self.notifyObservers(userMsg: "Internet connection not available", error: "\(error)", tellUsers: true)
+                self.notifyObservers(userMsg: "Internet connection not available", error: "\(String(describing: error))", tellUsers: true)
                 return
             }
             

@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import Western_Wheelers
+//@testable import Western_Wheelers
 
 class Western_WheelersTests: XCTestCase {
 
@@ -21,6 +21,8 @@ class Western_WheelersTests: XCTestCase {
     func testExample() throws {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
+//        let ldr = RidesLoader()
+//        ldr.loadRides()
     }
 
     func testPerformanceExample() throws {

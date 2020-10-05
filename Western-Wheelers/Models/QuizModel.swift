@@ -53,8 +53,7 @@ class QuizModel : ObservableObject {
         let query = CKQuery(recordType: "Quiz_Images", predicate: pred)
         let operation = CKQueryOperation(query: query)
         operation.desiredKeys = ["image", "image_num", "image_desc", "latitude", "longitude"]
-        //operation.queuePriority = .veryHigh
-        //if inView {
+        operation.queuePriority = .veryHigh
         operation.qualityOfService = .userInteractive
         
         if inView {

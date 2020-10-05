@@ -18,6 +18,9 @@
 		7B3A41D2252AC3C10095F169 /* Western_WheelersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3A41D1252AC3C10095F169 /* Western_WheelersTests.swift */; };
 		7B3A41DD252AC3C10095F169 /* Western_WheelersUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3A41DC252AC3C10095F169 /* Western_WheelersUITests.swift */; };
 		7B3A41F0252AC3EC0095F169 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B3A41EF252AC3EC0095F169 /* CloudKit.framework */; };
+		7B510E8A252B9B4F0056F858 /* RideWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B510E89252B9B4F0056F858 /* RideWebView.swift */; };
+		7B510E95252B9BB30056F858 /* RideLevelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B510E94252B9BB30056F858 /* RideLevelsView.swift */; };
+		7B510EA4252B9BFA0056F858 /* QuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B510EA3252B9BFA0056F858 /* QuizView.swift */; };
 		7B5DE41A252AC74C0054853B /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 7B5DE419252AC74C0054853B /* Podfile */; };
 		7BD1B36D252ACA6F003FBA2E /* RideSetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD1B36C252ACA6F003FBA2E /* RideSetView.swift */; };
 		7BD1B373252ACADC003FBA2E /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD1B372252ACADC003FBA2E /* Util.swift */; };
@@ -36,17 +39,14 @@
 		7BF3906A252AC8E0001CD41E /* StatsLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF39056252AC8E0001CD41E /* StatsLoader.swift */; };
 		7BF3906B252AC8E0001CD41E /* RidersTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF39057252AC8E0001CD41E /* RidersTracker.swift */; };
 		7BF3906C252AC8E0001CD41E /* Rides.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF39058252AC8E0001CD41E /* Rides.swift */; };
-		7BF3906D252AC8E0001CD41E /* QuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF39059252AC8E0001CD41E /* QuizView.swift */; };
 		7BF3906E252AC8E0001CD41E /* WAApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF3905A252AC8E0001CD41E /* WAApi.swift */; };
 		7BF3906F252AC8E0001CD41E /* LeaderStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF3905B252AC8E0001CD41E /* LeaderStats.swift */; };
 		7BF39070252AC8E0001CD41E /* ImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF3905C252AC8E0001CD41E /* ImageLoader.swift */; };
 		7BF39071252AC8E0001CD41E /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF3905D252AC8E0001CD41E /* Log.swift */; };
-		7BF39072252AC8E0001CD41E /* RideLevelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF3905E252AC8E0001CD41E /* RideLevelsView.swift */; };
 		7BF39073252AC8E0001CD41E /* Ride.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF3905F252AC8E0001CD41E /* Ride.swift */; };
 		7BF39074252AC8E0001CD41E /* RidesLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF39060252AC8E0001CD41E /* RidesLoader.swift */; };
 		7BF39075252AC8E0001CD41E /* QuizModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF39061252AC8E0001CD41E /* QuizModel.swift */; };
 		7BF39076252AC8E0001CD41E /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF39062252AC8E0001CD41E /* User.swift */; };
-		7BF39077252AC8E0001CD41E /* RideWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF39063252AC8E0001CD41E /* RideWebView.swift */; };
 		7BF39084252AC90F001CD41E /* PersonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF3907B252AC90F001CD41E /* PersonView.swift */; };
 		7BF39085252AC90F001CD41E /* ActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF3907C252AC90F001CD41E /* ActivityIndicator.swift */; };
 		7BF39086252AC90F001CD41E /* LeaderStatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF3907D252AC90F001CD41E /* LeaderStatisticsView.swift */; };
@@ -96,6 +96,9 @@
 		7B3A41DE252AC3C10095F169 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7B3A41ED252AC3E90095F169 /* Western-Wheelers.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Western-Wheelers.entitlements"; sourceTree = "<group>"; };
 		7B3A41EF252AC3EC0095F169 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		7B510E89252B9B4F0056F858 /* RideWebView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RideWebView.swift; sourceTree = "<group>"; };
+		7B510E94252B9BB30056F858 /* RideLevelsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RideLevelsView.swift; sourceTree = "<group>"; };
+		7B510EA3252B9BFA0056F858 /* QuizView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuizView.swift; sourceTree = "<group>"; };
 		7B5DE419252AC74C0054853B /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		7BD1B36C252ACA6F003FBA2E /* RideSetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RideSetView.swift; sourceTree = "<group>"; };
 		7BD1B372252ACADC003FBA2E /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
@@ -114,17 +117,14 @@
 		7BF39056252AC8E0001CD41E /* StatsLoader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatsLoader.swift; sourceTree = "<group>"; };
 		7BF39057252AC8E0001CD41E /* RidersTracker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RidersTracker.swift; sourceTree = "<group>"; };
 		7BF39058252AC8E0001CD41E /* Rides.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Rides.swift; sourceTree = "<group>"; };
-		7BF39059252AC8E0001CD41E /* QuizView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuizView.swift; sourceTree = "<group>"; };
 		7BF3905A252AC8E0001CD41E /* WAApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WAApi.swift; sourceTree = "<group>"; };
 		7BF3905B252AC8E0001CD41E /* LeaderStats.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LeaderStats.swift; sourceTree = "<group>"; };
 		7BF3905C252AC8E0001CD41E /* ImageLoader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageLoader.swift; sourceTree = "<group>"; };
 		7BF3905D252AC8E0001CD41E /* Log.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
-		7BF3905E252AC8E0001CD41E /* RideLevelsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RideLevelsView.swift; sourceTree = "<group>"; };
 		7BF3905F252AC8E0001CD41E /* Ride.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ride.swift; sourceTree = "<group>"; };
 		7BF39060252AC8E0001CD41E /* RidesLoader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RidesLoader.swift; sourceTree = "<group>"; };
 		7BF39061252AC8E0001CD41E /* QuizModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuizModel.swift; sourceTree = "<group>"; };
 		7BF39062252AC8E0001CD41E /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
-		7BF39063252AC8E0001CD41E /* RideWebView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RideWebView.swift; sourceTree = "<group>"; };
 		7BF3907B252AC90F001CD41E /* PersonView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonView.swift; sourceTree = "<group>"; };
 		7BF3907C252AC90F001CD41E /* ActivityIndicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivityIndicator.swift; sourceTree = "<group>"; };
 		7BF3907D252AC90F001CD41E /* LeaderStatisticsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LeaderStatisticsView.swift; sourceTree = "<group>"; };
@@ -269,8 +269,11 @@
 				7BF39080252AC90F001CD41E /* PeopleListView.swift */,
 				7BF3907B252AC90F001CD41E /* PersonView.swift */,
 				7BF39083252AC90F001CD41E /* ProfileEditView.swift */,
+				7B510EA3252B9BFA0056F858 /* QuizView.swift */,
 				7BF39081252AC90F001CD41E /* RideJoinView.swift */,
+				7B510E94252B9BB30056F858 /* RideLevelsView.swift */,
 				7BD1B36C252ACA6F003FBA2E /* RideSetView.swift */,
+				7B510E89252B9B4F0056F858 /* RideWebView.swift */,
 				7BF3907E252AC90F001CD41E /* SimpleTest.swift */,
 				7BF39082252AC90F001CD41E /* WWSignInView.swift */,
 			);
@@ -286,16 +289,13 @@
 				7BF39051252AC8E0001CD41E /* LeaderStatsLoader.swift */,
 				7BF3905D252AC8E0001CD41E /* Log.swift */,
 				7BF39061252AC8E0001CD41E /* QuizModel.swift */,
-				7BF39059252AC8E0001CD41E /* QuizView.swift */,
 				7BF3905F252AC8E0001CD41E /* Ride.swift */,
 				7BF39050252AC8E0001CD41E /* RideLevel.swift */,
-				7BF3905E252AC8E0001CD41E /* RideLevelsView.swift */,
 				7BF39052252AC8E0001CD41E /* RidersStats.swift */,
 				7BF39055252AC8E0001CD41E /* RiderStatisticsView.swift */,
 				7BF39057252AC8E0001CD41E /* RidersTracker.swift */,
 				7BF39058252AC8E0001CD41E /* Rides.swift */,
 				7BF39060252AC8E0001CD41E /* RidesLoader.swift */,
-				7BF39063252AC8E0001CD41E /* RideWebView.swift */,
 				7BF39056252AC8E0001CD41E /* StatsLoader.swift */,
 				7BF39062252AC8E0001CD41E /* User.swift */,
 				7BF3905A252AC8E0001CD41E /* WAApi.swift */,
@@ -575,10 +575,8 @@
 				7B3A41B8252AC3C00095F169 /* AppDelegate.swift in Sources */,
 				7B3A41BA252AC3C00095F169 /* SceneDelegate.swift in Sources */,
 				7BF3908C252AC90F001CD41E /* ProfileEditView.swift in Sources */,
-				7BF39072252AC8E0001CD41E /* RideLevelsView.swift in Sources */,
 				7BF39066252AC8E0001CD41E /* RidersStats.swift in Sources */,
 				7BF39088252AC90F001CD41E /* MultiLineTextView.swift in Sources */,
-				7BF3906D252AC8E0001CD41E /* QuizView.swift in Sources */,
 				7BF39069252AC8E0001CD41E /* RiderStatisticsView.swift in Sources */,
 				7BF39070252AC8E0001CD41E /* ImageLoader.swift in Sources */,
 				7BF3906C252AC8E0001CD41E /* Rides.swift in Sources */,
@@ -597,14 +595,16 @@
 				7BF39085252AC90F001CD41E /* ActivityIndicator.swift in Sources */,
 				7BD1B373252ACADC003FBA2E /* Util.swift in Sources */,
 				7BF3906F252AC8E0001CD41E /* LeaderStats.swift in Sources */,
+				7B510E8A252B9B4F0056F858 /* RideWebView.swift in Sources */,
 				7BD1B380252ACB85003FBA2E /* CloudKitManager.swift in Sources */,
 				7BF3906E252AC8E0001CD41E /* WAApi.swift in Sources */,
 				7BF3908A252AC90F001CD41E /* RideJoinView.swift in Sources */,
+				7B510E95252B9BB30056F858 /* RideLevelsView.swift in Sources */,
 				7BF39087252AC90F001CD41E /* SimpleTest.swift in Sources */,
-				7BF39077252AC8E0001CD41E /* RideWebView.swift in Sources */,
 				7BF39064252AC8E0001CD41E /* RideLevel.swift in Sources */,
 				7B3A41BF252AC3C00095F169 /* Western_Wheelers.xcdatamodeld in Sources */,
 				7BF39084252AC90F001CD41E /* PersonView.swift in Sources */,
+				7B510EA4252B9BFA0056F858 /* QuizView.swift in Sources */,
 				7BF39075252AC8E0001CD41E /* QuizModel.swift in Sources */,
 				7BF3906B252AC8E0001CD41E /* RidersTracker.swift in Sources */,
 			);

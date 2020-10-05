@@ -35,7 +35,7 @@ class CloudKitManager {
 
         operation.recordFetchedBlock = { record in
             let delay_secs = record["track_riders_delay_secs"] as! UInt32
-            let accuracy = record["location_update_accuracy"] as! Int
+            //let accuracy = record["location_update_accuracy"] as! Int
             RidersTracker.tracker.track_riders_delay_secs = delay_secs
             //LocationManager.lm().accuracy = accuracy
         }

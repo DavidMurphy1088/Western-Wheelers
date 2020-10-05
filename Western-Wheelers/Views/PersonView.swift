@@ -28,7 +28,9 @@ struct PersonView: View {
                         }
                     }
                     else {
-                        ActivityIndicator().frame(width: 50, height: 50).foregroundColor(Color.blue)
+                        VStack {
+                            ActivityIndicator().frame(width: 50, height: 50)
+                        }.foregroundColor(Color.blue)
                     }
                 }
             }
