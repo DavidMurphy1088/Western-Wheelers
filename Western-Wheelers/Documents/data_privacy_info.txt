@@ -1,0 +1,7 @@
+Please note that none of the identity information in this form is required to be entered by you to use the Western Wheelers app. All identity information is completely optional.
+
+Some of the features in the app wont work fully without some of this identity information. For example, if you want the app to locate your personal statistics in the web site ride statistics the app needs to know your last name.
+
+Also note that any of your identity information in this form can be cleared by you at any time. If your identify information is cleared, the app will continue to work as if your identity information had never been provided originally. If you enter any identify informtion it is stored locally on the phone only.
+
+

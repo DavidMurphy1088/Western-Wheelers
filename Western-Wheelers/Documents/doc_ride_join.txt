@@ -1,0 +1,7 @@
+When you join your ride other riders on your ride will be able to view your location during the ride. Once joined in the ride, you can also message the ride group. For example, to notify the group if you are delayed or have a problem.
+
+The app will only notify your location during the ride. At the end of the ride, or if you leave the ride, all location notifications are stopped.
+
+The app will ask permission to verify if it's ok to notify your location to other riders. If you would rather not give permission that's ok, and the app will not notify your location.
+
+To join a ride, you must have signed into the app (at least once) with your Western Wheelers username and password. This can be done when you first install the app.

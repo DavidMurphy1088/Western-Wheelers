@@ -1,0 +1,10 @@
+Profiles are a way to get to know the Western Wheeler's club members on your rides.
+
+When you create your profile it will be viewble by other users of the Western Wheelers app. You can delete or update your profile any time.
+
+To create a profile you will need to sign in one-time to the Western Wheelers site on Wild Apricot to authenticate your identity. This one-time authenticatation is required so we know its really you.
+
+When you delete your profile all your profile information is deleted and your profile will no longer by viewable by app users.
+
+To see members on your ride, you must have a profile and join a ride.
+
