@@ -31,25 +31,21 @@
       "size" : "40x40"
     },
     {
-      "filename" : "Icon-120.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "60x60"
     },
     {
-      "filename" : "Icon-180.png",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "60x60"
     },
     {
-      "filename" : "Icon-20.png",
       "idiom" : "ipad",
       "scale" : "1x",
       "size" : "20x20"
     },
     {
-      "filename" : "Icon-40.png",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "20x20"
@@ -80,19 +76,16 @@
       "size" : "76x76"
     },
     {
-      "filename" : "WW_logo_152_152.jpg",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "76x76"
     },
     {
-      "filename" : "WW_logo_167_167.jpg",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "83.5x83.5"
     },
     {
-      "filename" : "WW_logo_1024_1024.jpeg",
       "idiom" : "ios-marketing",
       "scale" : "1x",
       "size" : "1024x1024"
