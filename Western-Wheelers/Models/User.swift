@@ -46,7 +46,6 @@ class UserModel : ObservableObject {
         var listAll:[User] = []
         let queryOperation = CKQueryOperation(query: CKQuery(recordType: "People", predicate: NSPredicate(value: true)))
         // specify the zoneID from which the records should be retrieved
-        //queryOperation.zoneID = _zoneID
         queryOperation.desiredKeys = ["email", "name_last", "name_first", "ride_joined_id", "ride_joined_level", "ride_joined_date"]
         
         if warmup {
