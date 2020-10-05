@@ -92,9 +92,6 @@ class QuizModel : ObservableObject {
             }
 
         }
-        let ck = CKContainer.default()
-        let db = CKContainer.default().publicCloudDatabase
-        print (ck.privateCloudDatabase, ck.containerIdentifier, db)
         CKContainer.default().publicCloudDatabase.add(operation)
     }
 

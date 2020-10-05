@@ -9,8 +9,8 @@ class WAApi : ObservableObject {
     @Published var errMsg: String! = nil
 
     static private var wwApi:WAApi! = nil
-    private var username:String
-    private var password:String
+    private var WAUser:String
+    private var WAPwd:String
     private var token: String! = nil
     private var nameLast:String? = nil
     private var nameFirst:String? = nil
@@ -28,9 +28,9 @@ class WAApi : ObservableObject {
     }
     
     init() {
-        self.username = Util.apiKey(key: "WA_username")
+        self.WAUser = Util.apiKey(key: "WA_username")
         let pwd = Util.apiKey(key: "WA_pwd")
-        self.password = pwd+pwd+pwd
+        self.WAPwd = pwd+pwd+pwd
     }
     
     static func hexToStr(hex:String) -> String {
@@ -57,8 +57,8 @@ class WAApi : ObservableObject {
 
     func authenticateUserFromWASite (user: String, pwd: String) {
         self.errMsg = nil
-        self.username = user
-        self.password = pwd
+        self.WAUser = user
+        self.WAPwd = pwd
         let url = "https://oauth.wildapricot.org/auth/token"
         // tellUsers: false view has custom message for failed authentication
         apiCall(path: url, withToken: false, usrMsg: "Authenticating Wild Apricot Account", completion: parseAccessToken, apiType: ApiType.AuthenticateUser, tellUsers: false)
@@ -258,7 +258,7 @@ class WAApi : ObservableObject {
             let auth = "Basic aXNleTBqYWZwOTplYzMxdDN1Zjl1dWFha2h6cXB3NXFsYWF1ZTFnaTY="
             request.setValue(auth, forHTTPHeaderField: "Authorization")
             request.httpMethod = "POST"
-            let postString = "grant_type=password&username=\(self.username)&password=\(self.password)&scope=auto"
+            let postString = "grant_type=password&username=\(self.WAUser)&password=\(self.WAPwd)&scope=auto"
             request.httpBody = postString.data(using: String.Encoding.utf8);
         }
         
