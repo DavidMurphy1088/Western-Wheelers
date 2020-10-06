@@ -176,7 +176,8 @@ struct ProfileEditView: View {
 //                    user.info = self.profileUser.profileInfo
 //                    user.profileInfo = self.profileUser.profileInfo
                     user.picture = nil
-                    UserModel.userModel.currentUser = user
+                    //UserModel.userModel.currentUser = user
+                    UserModel.userModel.setCurrentUser(user: user)
                  }) {
                     Text("Remove Picture")
                 }
@@ -363,7 +364,6 @@ struct ProfileEditView: View {
         .onAppear() {
             if let user = UserModel.userModel.currentUser {
                 self.queryRunning = true
-
                 UserModel.userModel.searchUserByEmail(email: user.email!)
             }
             else {
@@ -377,14 +377,14 @@ struct ProfileEditView: View {
             //.onReceive - if a record was received, it will never be nil
         }
             
-        .onReceive(UserModel.userModel.$fetchedUser) {fetchedUser in
+        .onReceive(UserModel.userModel.$emailSearchUser) {searchedUser in
             if !self.queryRunning {
                 //view gets nil .onReceive of fetched user before it calls.onAppear
                 return
             }
             self.queryRunning = false
-            if let fetchedUser = fetchedUser {
-                UserModel.userModel.currentUser = fetchedUser
+            if let user = searchedUser {
+                UserModel.userModel.setCurrentUser(user: user)
             }
         }
             

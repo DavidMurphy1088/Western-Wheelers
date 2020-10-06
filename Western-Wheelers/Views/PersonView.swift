@@ -18,7 +18,6 @@ struct PersonView: View {
                             Image(uiImage: (self.userForView!.picture)!)
                             .resizable()
                             .scaledToFit()
-                            //.frame(height: 0.40 * geometry.size.height)
                         }
                         ScrollView{
                             Text(self.userForView!.info ?? "")
@@ -39,7 +38,7 @@ struct PersonView: View {
             self.userForView = nil
             self.model.fetchUser(recordId: self.recordId)
         }
-        .onReceive(UserModel.userModel.$fetchedUser) {fetchedUser in
+        .onReceive(UserModel.userModel.$fetchedIDUser) {fetchedUser in
             if fetchedUser != nil {
                 self.userForView = fetchedUser
             }

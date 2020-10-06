@@ -81,7 +81,7 @@ struct RideJoinView: View {
             user.joinedRideDate = Date()
         }
 
-        UserModel.userModel.currentUser = user
+        UserModel.userModel.setCurrentUser(user: user)
         user.saveProfile()
         //self.isPresented = false
         self.presentationMode.wrappedValue.dismiss()
@@ -116,7 +116,7 @@ struct RideJoinView: View {
                 //Section {
                 Spacer()
                 Text("Select from the rides coming up").foregroundColor(Color .blue)
-                Text("or under way that you can join").foregroundColor(Color .blue)
+                Text("or already under way that you can join").foregroundColor(Color .blue)
                 Form {
                     Picker(selection: Binding(           // << proxy binding
                                     get: {

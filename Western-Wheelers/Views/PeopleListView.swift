@@ -64,7 +64,7 @@ struct PeopleListView: View {
     @State var showProfile = false
     @State var showJoinRide = false
     @State var onMyRide = false
-    @State var userHasProfile = false
+    //@State var userHasProfile = false
     
     func rideTitle(id: String) -> String {
         for ride in Rides.instance().rides {
@@ -75,8 +75,11 @@ struct PeopleListView: View {
         return ""
     }
     
-    func getJoinEnabled() -> Bool {
-        return UserModel.userModel.fetchedUser != nil
+    func userHasProfile() -> Bool {
+        guard let user = UserModel.userModel.currentUser else {
+            return false
+        }
+        return !((user.info == nil || user.info == "") && user.picture == nil)
     }
     
     var body: some View {
@@ -132,7 +135,7 @@ struct PeopleListView: View {
                         Toggle("On My Ride", isOn: onMyRide).disabled(UserModel.userModel.currentUser == nil || UserModel.userModel.currentUser?.joinedRideID == nil || UserModel.userModel.currentUser!.joinedRideID == "")
                         .frame(width: geometry.size.width * 0.5)
                         
-                        //sometimes the email search results after the list results and so the current user show blank in the list - this attempts to fix that
+                        //sometimes the email search results come after the list results and so the current user show blank in the list - this attempts to fix that
                         //List(self.filteredUsers()) { user in
                         List(self.viewModel.viewUserList) { user in
                             //ForEach(UserModel.userModel.userList!) { user in
@@ -156,7 +159,6 @@ struct PeopleListView: View {
                                 Text("My Profile")
                             }
                             .padding()
-                            //.disabled(UserModel.userModel.currentUser == nil)
                             .disabled(model.currentUser == nil)
 
                             NavigationLink(destination: RideJoinView(
@@ -166,9 +168,7 @@ struct PeopleListView: View {
                             }
                             .padding()
                             //only enabled if user has profile
-                            //also check current user in case they they
-                            .disabled(UserModel.userModel.fetchedUser == nil ||
-                                        UserModel.userModel.fetchedUser?.email != UserModel.userModel.currentUser?.email)
+                            .disabled(!self.userHasProfile())
                             //.hiddenNavigationBarStyle()
 
                             Button(action: {
@@ -210,7 +210,7 @@ struct PeopleListView: View {
                 }
             }
             self.searchTerm = ""
-            userHasProfile = false
+            //userHasProfile = false
             if let user = UserModel.userModel.currentUser {
                 //do they have a profile?
                 UserModel.userModel.searchUserByEmail(email: user.email!)
@@ -221,18 +221,14 @@ struct PeopleListView: View {
             UserModel.userModel.loadAllUsers()
         }
         
-        .onReceive(UserModel.userModel.$fetchedUser) {user in
-            // called when a user is fetched with non nil user => they have a profile when the view appeared
-            // called with a nill user when this view navigates to the profile edit subview
+        .onReceive(UserModel.userModel.$emailSearchUser) {user in
+            // called when a user is returned from the email serach => they have a profile when the view appeared
+            // called with a nill user before this view navigates to the profile edit subview?
             if let user = user {
                 // this record may have been fetched by another view. e.g. the person view
                 if user.email == UserModel.userModel.currentUser?.email {
-                    self.userHasProfile = true
-                    UserModel.userModel.currentUser = User(user: user)
+                    UserModel.userModel.setCurrentUser(user: user)
                 }
-            }
-            else {
-                self.userHasProfile = false
             }
         }
         

@@ -11,14 +11,19 @@ class UserModel : ObservableObject {
     static let JOINED_RIDE_KEY = "ww_ride_joined"
     static var userModel = UserModel() //singleton
     
-    @Published var currentUser:User? = nil // created when user signs into WW, exists when apps find data in localUserModel.defaults at startup, ceases to exist when user deletes their profile
-    @Published var userProfileList:[User]? = nil
-    @Published var fetchedUser:User? = nil
-    
+    @Published private(set) var currentUser:User? = nil // created when user signs into WW, exists when apps find data in localUserModel.defaults at startup, ceases to exist when user deletes their profile
+    @Published private(set) var userProfileList:[User]? = nil
+    @Published private(set) var fetchedIDUser:User? = nil
+    @Published private(set) var emailSearchUser:User? = nil
+
     init() {
         if let _ = UserModel.defaults.string(forKey: "email") {
             currentUser = User(fromLocalSettings: true)
         }
+    }
+    
+    func setCurrentUser(user:User) {
+        currentUser = User(user: user)
     }
     
     func notifyAllLoaded(loaded:[User]) {
@@ -49,27 +54,16 @@ class UserModel : ObservableObject {
         queryOperation.desiredKeys = ["email", "name_last", "name_first", "ride_joined_id", "ride_joined_level", "ride_joined_date"]
         
         if warmup {
+            //pre-fetch on Cloudkit to make subsequent queries faster - maybe?
             queryOperation.recordFetchedBlock = {record in
-                if self.currentUser != nil {
-                    let user = User(record: record)
-                    self.fetchUser(recordId: user.recordId!, notify: false)
-                }
+                //if self.currentUser != nil {
+                let user = User(record: record)
+                self.fetchUser(recordId: user.recordId!, notify: false)
+                //}
             }
-            
         } else {
             queryOperation.recordFetchedBlock = {record in
-                // very bad idea, current user may not yet have a record id
-//                if let currentUser = self.currentUser {
-//                    if record["email"] == currentUser.email {
-//                        listAll.append(User(user: currentUser))
-//                    }
-//                    else {
-//                        listAll.append(User(record: record))
-//                    }
-//                }
-//                else {
-                    listAll.append(User(record: record))
-//                }
+                listAll.append(User(record: record))
             }
         }
         
@@ -140,7 +134,7 @@ class UserModel : ObservableObject {
                 if let record = record {
                     if notify {
                         DispatchQueue.main.async {
-                            self.fetchedUser = User(record: record)
+                            self.fetchedIDUser = User(record: record)
                         }
                     }
                 }
@@ -172,10 +166,10 @@ class UserModel : ObservableObject {
                             user.joinedRideLevel = nil
                         }
                     }
-                    self.fetchedUser = user
+                    self.emailSearchUser = user
                 }
                 else {
-                    self.fetchedUser = nil
+                    self.emailSearchUser = nil
                 }
             }
         })
@@ -190,8 +184,8 @@ class User : ObservableObject, Identifiable { //: NSObject, Identifiable, CLLoca
     // The value of identifierForVendor is the same for apps that come from the same vendor running on the same device
     // e.g. if the app is deleted and re-installed the device id changes..
     //var deviceId: String dont use device ID as a record key since it changes on every install of the app
-    var email:String? = nil
-    var recordId: CKRecord.ID? = nil
+    private(set) var email:String? = nil
+    private(set) var recordId: CKRecord.ID? = nil
     
     var nameFirst: String? = nil
     var nameLast: String? = nil
@@ -213,6 +207,10 @@ class User : ObservableObject, Identifiable { //: NSObject, Identifiable, CLLoca
     // -------------------- app state ---------------------
     
     init() {
+    }
+    
+    init(email: String) {
+        self.email = email
     }
     
     init(fromLocalSettings:Bool) {
@@ -302,9 +300,9 @@ class User : ObservableObject, Identifiable { //: NSObject, Identifiable, CLLoca
             return
         }
         self.saveLocalUserState()
-        DispatchQueue.main.async {
-            UserModel.userModel.fetchedUser = UserModel.userModel.currentUser
-        }
+//        DispatchQueue.main.async {
+//            UserModel.userModel.fetchedUser = UserModel.userModel.currentUser
+//        }
 
         let pred = NSPredicate(format: "email == %@", email)
         self.recordId = nil
@@ -338,9 +336,9 @@ class User : ObservableObject, Identifiable { //: NSObject, Identifiable, CLLoca
             os_log("attempt to delete profile nil user", log: Log.User, type: .error, "")
             return
         }
-        DispatchQueue.main.async {
-            UserModel.userModel.fetchedUser = nil //UserModel.userModel.currentUser
-        }
+//        DispatchQueue.main.async {
+//            UserModel.userModel.fetchedUser = nil //UserModel.userModel.currentUser
+//        }
 
         let pred = NSPredicate(format: "email == %@", email)
         UserModel.userModel.remoteQuery(pred: pred, fields: ["email"], fetch: { rec in
@@ -353,7 +351,6 @@ class User : ObservableObject, Identifiable { //: NSObject, Identifiable, CLLoca
                 self.remoteDelete(completion: {
                     self.recordId = nil
                     UserModel.userModel.loadAllUsers()
-                    
                 })
             }
         })

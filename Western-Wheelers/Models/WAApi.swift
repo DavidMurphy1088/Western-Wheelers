@@ -231,13 +231,13 @@ class WAApi : ObservableObject {
             }
         }
         if let email = email {
-            let user = User()
-            user.email = email
+            let user = User(email: email)
+            //user.email = email
             user.nameFirst = nameFirst
             user.nameLast = nameLast
             user.saveLocalUserState()
             DispatchQueue.main.async {
-                UserModel.userModel.currentUser = user
+                UserModel.userModel.setCurrentUser(user: user)
             }
         }
         else {
