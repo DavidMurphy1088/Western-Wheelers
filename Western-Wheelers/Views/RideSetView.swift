@@ -74,25 +74,38 @@ struct RideSetView: View {
         return ridesToShow
     }
     
+    struct RideDetails: View {
+        @State var ride:Ride
+        var body: some View {
+            HStack () {
+                Text("\(ride.dateDisp())")
+                Spacer()
+                if ride.weatherDisp == nil {
+                    if ride.activeStatus() == Ride.ActiveStatus.UpComing && ride.isEveningRide() {
+                        Text(" Evening ").background(Color(red: 0.96, green:0.96, blue:0.96))
+                    }
+                }
+                else {
+                    ride.weatherDisp.map({
+                        Text($0).italic().background(Color(red: 1.0, green:1.0, blue:0.8))
+                    })
+                }
+            }
+
+        }
+    }
+    
     var body: some View {
         VStack {
             if self.rides != nil {
                 List(self.rideList()!) {
-                    ride in
+                    ride in 
                     VStack {
                         NavigationLink(destination: RideWebView(model: WebViewModel(link: ride.rideUrl()))) {
                             VStack(alignment: HorizontalAlignment.leading) {
                                 Text("\(ride.titleFull ?? "no title")")
                                     .font(.system(size: 18, weight: self.rideWeight(ride: ride), design: .default))
-                                HStack () {
-                                    Text("\(ride.dateDisp())")
-
-                                    Spacer()
-                                    ride.weatherDisp.map({ Text($0)
-                                        .italic()
-                                        .background(Color(red: 1.0, green:1.0, blue:0.8))
-                                    })
-                                }
+                                RideDetails(ride: ride)
                                 if ride.activeStatus() == Ride.ActiveStatus.Active {
                                     Text("Ride is underway")
                                 }

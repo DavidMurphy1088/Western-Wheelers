@@ -56,12 +56,12 @@ class WeatherAPI  : NSObject, ObservableObject {
                 // This free weather service is unreliable - dont error to user if it fails
                 let task = URLSession.shared.dataTask(with: url, completionHandler: { (data, response, error) in
                     if let error = error {
-                        Util.app().reportError(class_type: type(of: self), usrMsg: "Error loading weather", error: "\(error)", tellUsers: false)
+                        Util.app().reportError(class_type: type(of: self), context: "Error loading weather", error: "\(error)", informUsers: false)
                         return
                     }
                     guard let httpResponse = response as? HTTPURLResponse,
                       (200...299).contains(httpResponse.statusCode) else {
-                        Util.app().reportError(class_type: type(of: self), usrMsg: "Bad HTTP status loading weather \(response.debugDescription)", error: "not HTTP 200", tellUsers: false)
+                        Util.app().reportError(class_type: type(of: self), context: "Bad HTTP status loading weather \(response.debugDescription)", error: "not HTTP 200", informUsers: false)
                         return
                     }
                     
@@ -73,12 +73,10 @@ class WeatherAPI  : NSObject, ObservableObject {
                             }
                         }
                         else {
-                            //self.notifyObservers(msg: "Cannot parse weather data JSON")
-                            Util.app().reportError(class_type: type(of: self), usrMsg: "Cannot parse weather data json", error: "Cannot parse weather data JSON", tellUsers: false)
+                            Util.app().reportError(class_type: type(of: self), context: "Cannot parse weather data json", error: nil, informUsers: false)
                         }
                     } else {
-                        //self.notifyObservers(msg: "No weather data")
-                        Util.app().reportError(class_type: type(of: self), usrMsg: "no weather data json", error: "no data", tellUsers: false)
+                        Util.app().reportError(class_type: type(of: self), context: "no weather data json", error: "no data", informUsers:  false)
                     }
                 })
                 task.resume()

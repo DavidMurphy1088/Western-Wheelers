@@ -50,10 +50,11 @@ class Rides : ObservableObject {
         for ride in rides {
             for weather_date in weather_dates {
                 //Rides.show_date(d: weather_date, msg: "apply weather")
-                // the weather date is the date/time they are forecasting the weather for - at this time its 1:00 pm daily. (i.e. not the time they made the forecast)
+                // the weather date is the date/time they are forecasting the weather for - at this time its noon daily. (i.e. not the time they made the forecast)
                 let diff = weather_date.timeIntervalSinceReferenceDate - ride.dateTime.timeIntervalSinceReferenceDate
-                let hours_diff = Float(diff/(60 * 60)) // hours diff ride start vs time forecasted
-                if hours_diff >= 0 && hours_diff < 8.0 {
+                let hours_diff = Double(diff/(60 * 60)) // hours diff ride start vs time forecasted
+                //is forecast between ride start and end?
+                if hours_diff >= 0 && hours_diff < Ride.LONGEST_RIDE_IN_HOURS {
                     ride.weather_date = weather_date
                     let day_weather = weatherDayData[weather_date]
                     ride.weather_day = day_weather!.temp.day
@@ -61,11 +62,10 @@ class Rides : ObservableObject {
                     ride.weather_max = day_weather!.temp.max
                     ride.weather_min = day_weather!.temp.min
                     ride.weather_min_celsius = ((ride.weather_min ?? 0) - 32.0) * (5.0 / 9.0)
-
                     ride.weather_pressure = day_weather!.pressure
                     ride.weather_description = day_weather!.weather[0].description
                     ride.weather_main = day_weather!.weather[0].main
-
+                    print (ride.dateDisp(), ride.weather_day, "Max", ride.weather_max, ride.weather_main)
                     if ride.weather_main != nil {
                         ride.weatherDisp = "  \(ride.weather_main!) \(String(format: "%.0f", ride.weather_day!))°  "
                         applied += 1
@@ -73,10 +73,13 @@ class Rides : ObservableObject {
                     break
                 }
             }
+            if ride.weatherDisp == nil {
+                if ride.isEveningRide() {
+                    ride.weatherDisp = " Evening "
+                }
+            }
+            
         }
-//        if applied == 0 {
-//            Util.app().report_error(class_type: type(of: self), error: "\(weather_dates.count) weather data rows was not applied to any of the \(rides.count) rides")
-//        }
     }
     
     //load weather dates and icon image from JSON for each day and dictionary of icon->image

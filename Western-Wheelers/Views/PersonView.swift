@@ -8,10 +8,20 @@ struct PersonView: View {
     @State var recordId:CKRecord.ID
     @State var userForView:User?
     
+//    var body1: some View {
+//        NavigationView { //but creates yet more unwanted space at top of view
+//        GeometryReader { geometry in
+//        Text("TEST")
+//        }
+//        .alignmentGuide(HorizontalAlignment.center) { _ in  0 }
+//        }
+//    }
+    
     var body: some View {
-        NavigationView { //but creates yet more unwanted space at top of view
-            GeometryReader { geometry in
-                VStack {
+        NavigationView { //required but creates yet more unwanted space at top of view
+            //Geo reader here seems to force everything left on the screen. Seems like a SwiftUI bug?
+            //GeometryReader { geometry in
+                VStack() {
                     if self.userForView != nil {
                         Text("\(self.userForView!.nameFirst!) \(self.userForView!.nameLast!)").font(.title)
                         if self.userForView!.picture != nil {
@@ -23,7 +33,7 @@ struct PersonView: View {
                             Text(self.userForView!.info ?? "")
                             .padding()
                             // for some unknwon reason must force width, otherwise profiles with no or minimal text left justify
-                                .frame(width: geometry.size.width * 0.95)
+                            //.frame(width: geometry.size.width * 0.95)
                         }
                     }
                     else {
@@ -32,7 +42,7 @@ struct PersonView: View {
                         }.foregroundColor(Color.blue)
                     }
                 }
-            }
+            //}
         }
         .onAppear() {
             self.userForView = nil

@@ -135,10 +135,9 @@ struct QuizView: View {
             else {
                 if self.imageQuiz == nil {
                     VStack {
-                        ActivityIndicator()
-                            .frame(width: 50, height: 50)
-                        }.foregroundColor(Color.blue)
-                        Text("Loaded images: \(self.quizModel.indexLoaded)")
+                        ActivityIndicator().frame(width: 50, height: 50)
+                    }.foregroundColor(Color.blue)
+                    Text("Loaded images: \(self.quizModel.indexLoaded)")
                 }
                 else {
                     Text("Where is this ride?")

@@ -38,8 +38,8 @@ class QuizModel : ObservableObject {
     @Published var modelError:String? // = ""
     @Published var indexLoaded = 0
 
-    func notifiyError(fcn: String, usrMsg: String, error:String) {
-        Util.app().reportError(class_type: type(of: self), usrMsg:usrMsg, error: error) //, error: "func: " + fcn + "err:" + reason)
+    func notifiyError(function: String, context: String, error:String) {
+        Util.app().reportError(class_type: type(of: self), context: context, error: error) //, error: "func: " + fcn + "err:" + reason)
         for _ in 0...1 { // for some utterly unknown reason needs 2 attempts else target gets nil
             DispatchQueue.main.async {
                 self.modelError = error
@@ -72,11 +72,11 @@ class QuizModel : ObservableObject {
 
             operation.queryCompletionBlock = { [unowned self] (cursor, error) in
                 if error != nil {
-                    self.notifiyError(fcn: "init", usrMsg:"Cannot load quiz images", error: (error?.localizedDescription ?? ""))
+                    self.notifiyError(function: "init", context:"Cannot load quiz images", error: (error?.localizedDescription ?? ""))
                 }
                 else {
                     if self.imageRecords.count == 0 {
-                        self.notifiyError(fcn: "init", usrMsg:"Zero quiz images", error: (error?.localizedDescription ?? ""))
+                        self.notifiyError(function: "init", context:"Zero quiz images", error: (error?.localizedDescription ?? ""))
                     }
                     else {
                         self.questionIndexOrder.shuffle()
@@ -165,7 +165,7 @@ class QuizModel : ObservableObject {
 
         operation.perRecordCompletionBlock = { record, _, error in
             if error != nil {
-                self.notifiyError(fcn: "read image record", usrMsg: "Cannot read image (error?.localizedDescription)", error: error?.localizedDescription ?? "")
+                self.notifiyError(function: "read image record", context: "Cannot read image (error?.localizedDescription)", error: error?.localizedDescription ?? "")
             }
             if record != nil {
                 let im = record?.object(forKey: "image") as! CKAsset

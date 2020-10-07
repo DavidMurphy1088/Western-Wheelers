@@ -5,18 +5,18 @@ import SwiftSoup
 
 class StatsLoader: ObservableObject {
     public static let instance = StatsLoader();
-    var error_msg: String? = nil
+    //var error_msg: String? = nil
     static var first_ride = true
     public let data_was_loaded = PassthroughSubject<Int?, Never>()
     
-    func notifyObservers(count: Int? = nil, userMsg: String? = nil, error: String? = nil, tellUsers:Bool = false) {
+    func notifyObservers(count: Int? = nil, context: String, error: String? = nil) { //}, informUsers: Bool = false) {
         if count != nil {
             data_was_loaded.send(count!)
         }
         else {
             data_was_loaded.send(nil)
-            self.error_msg = userMsg
-            Util.app().reportError(class_type: type(of: self), usrMsg: userMsg, error: error, tellUsers: tellUsers)
+            //self.error_msg = userMsg
+            Util.app().reportError(class_type: type(of: self), context: context, error: error) //, tellUsers: informUsers)
         }
     }
     
@@ -33,13 +33,13 @@ class StatsLoader: ObservableObject {
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             
             if error != nil {
-                self.notifyObservers(userMsg: "Internet connection not available", error: "\(String(describing: error))", tellUsers: true)
+                self.notifyObservers(context: "Internet connection not available", error: "\(String(describing: error))")
                 return
             }
             
             if let response = response as? HTTPURLResponse {
                 if response.statusCode != 200 {
-                    self.notifyObservers(userMsg: "Web site not available")
+                    self.notifyObservers(context: "Stats web site not available")
                     return
                 }
             }
@@ -78,22 +78,22 @@ class StatsLoader: ObservableObject {
                     }
                     let count = RidersStats.instance.stats_by_rider.count
                     if count > 0 {
-                        self.notifyObservers(count: count, userMsg: nil)
+                        self.notifyObservers(count: count, context: "load stats", error: nil)
                     }
                     else {
                         let msg = "zero rows of rider stats"
-                        self.notifyObservers(count: nil, userMsg: msg)
+                        self.notifyObservers(count: nil, context: msg)
                     }
 
                 } catch Exception.Error( _, _) {
-                    self.notifyObservers(count: nil, userMsg: "Cannot load stats data")
+                    self.notifyObservers(count: nil, context: "Cannot load stats data")
                 }
                 catch {
-                    self.notifyObservers(count: nil, userMsg: "cannot parse stats html")
+                    self.notifyObservers(count: nil, context: "cannot parse stats html")
                 }
             }
             else {
-                self.notifyObservers(userMsg: "cannot parse html")
+                self.notifyObservers(context: "cannot parse html")
             }
         }
         task.resume()

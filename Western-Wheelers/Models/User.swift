@@ -77,7 +77,7 @@ class UserModel : ObservableObject {
             queryOperation.queryCompletionBlock = { [weak self] (cursor : CKQueryOperation.Cursor?, error : Error?) -> Void in
                 // Continue if there are no errors
                 guard error == nil else {
-                    Util.app().reportError(class_type: type(of: self!), usrMsg: "Cannot load users", error: error?.localizedDescription ?? "")
+                    Util.app().reportError(class_type: type(of: self!), context: "Cannot load users", error: error?.localizedDescription ?? "")
                     //completion(error)
                     return
                 }
@@ -118,7 +118,7 @@ class UserModel : ObservableObject {
             if error == nil {
                 completion()
             } else {
-                Util.app().reportError(class_type: type(of: self), usrMsg: "Cannot remote query", error: error?.localizedDescription ?? "")
+                Util.app().reportError(class_type: type(of: self), context: "Cannot remote query users", error: error?.localizedDescription ?? "")
             }
         }
         CKContainer.default().publicCloudDatabase.add(operation)
@@ -128,7 +128,7 @@ class UserModel : ObservableObject {
         CKContainer.default().publicCloudDatabase.fetch(withRecordID: recordId) { /*[unowned self]*/ record, error in
             if let _ = error {
                 DispatchQueue.main.async {
-                    Util.app().reportError(class_type: type(of: self), usrMsg: "Cannot fetch record", error: error?.localizedDescription ?? "")
+                    Util.app().reportError(class_type: type(of: self), context: "Cannot fetch user record", error: error?.localizedDescription ?? "")
                 }
             } else {
                 if let record = record {
@@ -300,9 +300,6 @@ class User : ObservableObject, Identifiable { //: NSObject, Identifiable, CLLoca
             return
         }
         self.saveLocalUserState()
-//        DispatchQueue.main.async {
-//            UserModel.userModel.fetchedUser = UserModel.userModel.currentUser
-//        }
 
         let pred = NSPredicate(format: "email == %@", email)
         self.recordId = nil
@@ -336,9 +333,6 @@ class User : ObservableObject, Identifiable { //: NSObject, Identifiable, CLLoca
             os_log("attempt to delete profile nil user", log: Log.User, type: .error, "")
             return
         }
-//        DispatchQueue.main.async {
-//            UserModel.userModel.fetchedUser = nil //UserModel.userModel.currentUser
-//        }
 
         let pred = NSPredicate(format: "email == %@", email)
         UserModel.userModel.remoteQuery(pred: pred, fields: ["email"], fetch: { rec in
@@ -346,7 +340,7 @@ class User : ObservableObject, Identifiable { //: NSObject, Identifiable, CLLoca
         },
         completion: {
             if self.recordId == nil {
-                Util.app().reportError(class_type: type(of: self), usrMsg: "record to delete not found")
+                Util.app().reportError(class_type: type(of: self), context: "user record to delete not found")
             } else {
                 self.remoteDelete(completion: {
                     self.recordId = nil
@@ -384,15 +378,15 @@ class User : ObservableObject, Identifiable { //: NSObject, Identifiable, CLLoca
 
         CKContainer.default().publicCloudDatabase.save(ck_record) { (record, err) in
             if let err = err {
-                Util.app().reportError(class_type: type(of: self), usrMsg: "remote add", error: err.localizedDescription)
+                Util.app().reportError(class_type: type(of: self), context: "cannot save user", error: err.localizedDescription)
                 return
             }
             guard let record = record else {
-                Util.app().reportError(class_type: type(of: self), usrMsg: "remote add, nil record", error: err?.localizedDescription)
+                Util.app().reportError(class_type: type(of: self), context: "add user, nil record", error: err?.localizedDescription)
                 return
             }
             guard (record["email"] as? String) != nil else {
-                Util.app().reportError(class_type: type(of: self), usrMsg: "remote add no email stored", error: err?.localizedDescription)
+                Util.app().reportError(class_type: type(of: self), context: "add user but no email stored", error: err?.localizedDescription)
                 return
             }
             completion(record.recordID)
@@ -445,7 +439,7 @@ class User : ObservableObject, Identifiable { //: NSObject, Identifiable, CLLoca
         op.savePolicy = .allKeys  //2 hours later ... required otherwise it does NOTHING :( :(
         op.modifyRecordsCompletionBlock = { savedRecords, deletedRecordIDs, error in
             if error != nil || savedRecords?.count != 1 {
-                Util.app().reportError(class_type: type(of: self), usrMsg: "Cannot modify record", error: error?.localizedDescription ?? "")
+                Util.app().reportError(class_type: type(of: self), context: "Cannot modify user record", error: error?.localizedDescription ?? "")
             }
             else {
                 completion()
@@ -459,7 +453,7 @@ class User : ObservableObject, Identifiable { //: NSObject, Identifiable, CLLoca
         op.savePolicy = .allKeys  //2 hours later ... required otherwwise it does NOTHING :( :(
         op.modifyRecordsCompletionBlock = { savedRecords, deletedRecordIDs, error in
             if error != nil || deletedRecordIDs?.count != 1 {
-                Util.app().reportError(class_type: type(of: self), usrMsg: "Cannot delete record", error: error?.localizedDescription ?? "")
+                Util.app().reportError(class_type: type(of: self), context: "Cannot delete user record", error: error?.localizedDescription ?? "")
             }
             else {
                 completion()

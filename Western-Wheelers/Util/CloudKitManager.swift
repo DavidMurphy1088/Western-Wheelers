@@ -42,7 +42,7 @@ class CloudKitManager {
         
         operation.queryCompletionBlock = { (cursor, error) in
             if error != nil {
-                Util.app().reportError(class_type: type(of: self), usrMsg: "load settings", error: error?.localizedDescription)
+                Util.app().reportError(class_type: type(of: self), context: "Load global settings", error: error?.localizedDescription)
             }
         }
         CKContainer.default().publicCloudDatabase.add(operation)

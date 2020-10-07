@@ -4,7 +4,6 @@ import os.log
 
 // Wild Apricot user
 
-
 class WAApi : ObservableObject {
     @Published var errMsg: String! = nil
 
@@ -14,7 +13,7 @@ class WAApi : ObservableObject {
     private var token: String! = nil
     private var nameLast:String? = nil
     private var nameFirst:String? = nil
-    //TEST11
+
     enum ApiType {
         case LoadRides, AuthenticateUser, None
     }
@@ -241,13 +240,11 @@ class WAApi : ObservableObject {
             }
         }
         else {
-            Util.app().reportError(class_type: type(of: self), usrMsg: "cannot parse json user data")
+            Util.app().reportError(class_type: type(of: self), context: "cannot parse WA json user data")
         }
     }
 
     func apiCall(path: String, withToken:Bool, usrMsg:String, completion: @escaping (Any, Data, ApiType, String, Bool) -> (), apiType: ApiType, tellUsers:Bool) {
-    //func apiCall(path: String, with_token:Bool, completion: @escaping (Data) -> ()) {
-        //self.errorMsg = nil
         let url = URL(string: path)
         var request = URLRequest(url: url!)
 
@@ -265,7 +262,7 @@ class WAApi : ObservableObject {
         let task = URLSession.shared.dataTask(with: request) { rawData, response, error in
             guard let rawData = rawData, let response = response as? HTTPURLResponse, error == nil else {
                 let msg = usrMsg
-                Util.app().reportError(class_type: type(of: self), usrMsg: msg, error: error?.localizedDescription)
+                Util.app().reportError(class_type: type(of: self), context: msg, error: error?.localizedDescription)
                 self.publishError(error: msg)
                 return
             }
@@ -273,7 +270,7 @@ class WAApi : ObservableObject {
                 // check for http errors. 400 if authenctication fails
                 let msg = "Unexpected Wild Apricot HTTP Status:\(response.statusCode)"
                 // failed user or pwd
-                Util.app().reportError(class_type: type(of: self), usrMsg: msg, error: error?.localizedDescription, tellUsers: tellUsers)
+                Util.app().reportError(class_type: type(of: self), context: msg, error: error?.localizedDescription)
                 self.publishError(error: msg)
                 return
             }
@@ -283,7 +280,7 @@ class WAApi : ObservableObject {
                 }
             } catch let error as NSError {
                 let msg = "Cannot parse json"
-                Util.app().reportError(class_type: type(of: self), usrMsg: msg, error: error.localizedDescription)
+                Util.app().reportError(class_type: type(of: self), context: msg, error: error.localizedDescription)
                 self.publishError(error: msg)
             }
         }

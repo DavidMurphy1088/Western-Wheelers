@@ -7,7 +7,8 @@ class Ride : Identifiable, Equatable, ObservableObject  {
     //static let MAX_RIDE_DURATION_HOURS = 12.0 // (12.0 * 60.0 * 60.0) // hours after which ride is considered ended, 7 hrs
     static let EARLIEST_JOIN_HOURS = 24.0 //  number of hours before ride start when a rider can join
     static let DAYS_HILIGHTED_AS_NEARBY = 24.0 //  number of hours before ride start when a rider can join
-
+    static let LONGEST_RIDE_IN_HOURS = 8.0 //asume max ride length of 8 hrs
+    
     //Can't be optional. Loaded from the WA API. For events 'series' the QA id is the same for each instance of the event.
     //So for event uniqueness with event series instances, the rideID is the 'event ID' + the instance number. e.g. event = 12345, instance 15 the id is 12345-15
     //For a ride not in a series the instance number is omitted. e.g. 12345
@@ -17,8 +18,6 @@ class Ride : Identifiable, Equatable, ObservableObject  {
 
     var dateTime: Date = Date()          // ride must have date and this date is always GMT. This date is the ride date AND start time
 
-    var weatherDisp: String? = nil
-
     var url: String?
     var titleFull: String?
 
@@ -27,8 +26,8 @@ class Ride : Identifiable, Equatable, ObservableObject  {
     var weather_main: String?
     var weather_description: String?
     var weather_icon: String?
-    var weather_image: Image?
     
+    var weatherDisp: String? = nil
     var weather_day: Float?
     var weather_day_celsius: Float?
     var weather_min: Float?
@@ -37,8 +36,6 @@ class Ride : Identifiable, Equatable, ObservableObject  {
     var weather_wind: Float?
     var weather_pressure: Int?
         
-    //var htmlLinkableObs: [HTMLLinkedObject] = [HTMLLinkedObject]()
-    
     enum ActiveStatus {
         case Past, RecentlyClosed, Active, UpComing, Future
     }
@@ -47,7 +44,7 @@ class Ride : Identifiable, Equatable, ObservableObject  {
         let seconds = Date().timeIntervalSince(self.dateTime) // > 0 => ride start in past
         let minutes = seconds / 60.0
         let startHours = minutes / 60
-        let endHours = startHours - 7.0 //asume max ride length of 8 hrs
+        let endHours = startHours - Ride.LONGEST_RIDE_IN_HOURS
         
         if endHours > 16.0 {
             return ActiveStatus.Past
@@ -123,7 +120,6 @@ class Ride : Identifiable, Equatable, ObservableObject  {
 //        df.dateFormat = "yyyy-MM-dd HH:mm:ssz"
 //        //df.timeZone = TimeZone(abbreviation: "UTC")
 //        return df.string(from: dateTime)
-        
         let formatter = DateFormatter() // this formats the day,time according to users local timezone
         formatter.dateFormat = "EEEE MMM d"
         let dayDisp = formatter.string(from: self.dateTime)
@@ -135,29 +131,17 @@ class Ride : Identifiable, Equatable, ObservableObject  {
         return dayDisp + ", " + timeDisp
     }
     
-//    func minutesBeforeRideStart() -> Double {
-//        // how much time after the ride start are we?
-//        // > 0 => current time is before ride start
-//        return (dateTime.timeIntervalSince1970 - Date().timeIntervalSince1970) / 60.0
-//    }
-//    
-//    func rideIsOpen() -> Bool {
-//        let hoursBeforeRideStart = minutesBeforeRideStart() / 60.0
-//        return hoursBeforeRideStart < Ride.EARLIEST_JOIN_HOURS
-//    }
-        
-//    func rideHasEnded() -> Bool {
-//        let formatter = DateFormatter()
-//        formatter.dateFormat = "yyyy MM dd HH:mm:ss"
-//        let start = formatter.string(from: dateTime)
-//        let endTime = dateTime.addingTimeInterval(Ride.MAX_RIDE_DURATION_HOURS * 60.0 * 60)
-//        //let ee = formatter.string(from: endTime)
-//        //let start = ride.dateTime.addingTimeInterval(Ride.MAX_RIDE_DURATION_HOURS * 24.0 * 60.0)
-//        let minutesAfterRideStart = 0 - minutesBeforeRideStart()
-//        let hoursAfterRideStart = (0 - minutesBeforeRideStart()) / 60.0
-//        return hoursAfterRideStart > Ride.MAX_RIDE_DURATION_HOURS
-//    }
+    func startHour() -> Int {
+        let formatter = DateFormatter() // this formats the day,time according to users local timezone
+        formatter.dateFormat = "HH"
+        let timeDisp = formatter.string(from: self.dateTime)
+        return Int(timeDisp)!
+    }
     
+    func isEveningRide() -> Bool {
+        return startHour() >= 16
+    }
+
     static func == (lhs: Ride, rhs: Ride) -> Bool {
         return lhs.id == rhs.id
     }
@@ -200,14 +184,14 @@ class Ride : Identifiable, Equatable, ObservableObject  {
 
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             if let error = error {
-                Util.app().reportError(class_type: type(of: self), usrMsg: "Cannot parse rides HTML", error: "\(error)")
+                Util.app().reportError(class_type: type(of: self), context: "Cannot parse rides HTML", error: "\(error)")
                 return
             }
             
             // Read HTTP Response Status code
             if let response = response as? HTTPURLResponse {
                 if response.statusCode != 200 {
-                    Util.app().reportError(class_type: type(of: self), usrMsg: "Bad HTTP response \(response.statusCode)", error: "\(response.statusCode)")
+                    Util.app().reportError(class_type: type(of: self), context: "Bad HTTP response \(response.statusCode)", error: "\(response.statusCode)")
                     return
                 }
             }
@@ -238,15 +222,15 @@ class Ride : Identifiable, Equatable, ObservableObject  {
                     }
 
                 } catch Exception.Error(_, _) {
-                    Util.app().reportError(class_type: type(of: self), usrMsg: "Cannot parse rides HTML data")
+                    Util.app().reportError(class_type: type(of: self), context: "Cannot parse rides HTML data")
                 }
                 catch {
-                    Util.app().reportError(class_type: type(of: self), usrMsg: "cannot parse html")
+                    Util.app().reportError(class_type: type(of: self), context: "cannot parse html")
                 }
             }
             else {
                 let msg = "cannot parse html"
-                Util.app().reportError(class_type: type(of: self), usrMsg: "No ride HTML data", error: msg)
+                Util.app().reportError(class_type: type(of: self), context: "No ride HTML data", error: msg)
             }
             
             self.html_analyse()

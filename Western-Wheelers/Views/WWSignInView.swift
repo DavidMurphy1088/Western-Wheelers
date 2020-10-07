@@ -6,7 +6,7 @@ import os.log
 struct WWSignInView: View {
     @Binding var isPresented: Bool
     @ObservedObject private var api = WAApi.instance()
-    @State private var username = "" //davidp.murphy@sbcglobal.net" //TOxDO
+    @State private var username = "" //daxvixdp.murphy@sbcglobal.net" //TxODO
     @State private var password = ""
     @State private var failedSigin = false
     @State private var keyboardHeight: CGFloat = 0

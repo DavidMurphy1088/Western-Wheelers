@@ -64,7 +64,6 @@ struct PeopleListView: View {
     @State var showProfile = false
     @State var showJoinRide = false
     @State var onMyRide = false
-    //@State var userHasProfile = false
     
     func rideTitle(id: String) -> String {
         for ride in Rides.instance().rides {
@@ -132,7 +131,10 @@ struct PeopleListView: View {
                             .autocapitalization(.none)
                             //.returnKeyType = .next
                         }
-                        Toggle("On My Ride", isOn: onMyRide).disabled(UserModel.userModel.currentUser == nil || UserModel.userModel.currentUser?.joinedRideID == nil || UserModel.userModel.currentUser!.joinedRideID == "")
+                        Toggle("On My Ride", isOn: onMyRide).disabled(
+                            UserModel.userModel.currentUser == nil ||
+                            UserModel.userModel.currentUser?.joinedRideID == nil ||
+                            UserModel.userModel.currentUser!.joinedRideID == "")
                         .frame(width: geometry.size.width * 0.5)
                         
                         //sometimes the email search results come after the list results and so the current user show blank in the list - this attempts to fix that
@@ -161,15 +163,14 @@ struct PeopleListView: View {
                             .padding()
                             .disabled(model.currentUser == nil)
 
-                            NavigationLink(destination: RideJoinView(
-                                                                     joinedRide: UserModel.userModel.currentUser?.joinedRideID,
-                                                                     joinedRideLevel: UserModel.userModel.currentUser?.joinedRideLevel), isActive: $showJoinRide) {
+                            NavigationLink(destination: RideJoinView(onRideFilterOn: $onMyRide, joinedRide: UserModel.userModel.currentUser?.joinedRideID,
+                                                                     joinedRideLevel: UserModel.userModel.currentUser?.joinedRideLevel),
+                                                                     isActive: $showJoinRide) {
                                 Text("Join/Leave Ride")
                             }
                             .padding()
                             //only enabled if user has profile
                             .disabled(!self.userHasProfile())
-                            //.hiddenNavigationBarStyle()
 
                             Button(action: {
                                 if !CloudKitManager.manager.canReadData() {
@@ -222,7 +223,7 @@ struct PeopleListView: View {
         }
         
         .onReceive(UserModel.userModel.$emailSearchUser) {user in
-            // called when a user is returned from the email serach => they have a profile when the view appeared
+            // called when a user is returned from the email search => they have a profile when the view appeared
             // called with a nill user before this view navigates to the profile edit subview?
             if let user = user {
                 // this record may have been fetched by another view. e.g. the person view
@@ -233,10 +234,18 @@ struct PeopleListView: View {
         }
         
         .onReceive(UserModel.userModel.$userProfileList) {users in
+            //user may have saved or deleted their profile (which causes the model to reload all users. e.g to have the new profile show if the user added one profile)
             guard let users = users else {
                 return
             }
-            viewModel.filterUserList(userList: users, searchTerm: "", searchRideId: nil, searchRideLevel: nil)
+            if !self.userHasProfile() {
+                self.onMyRide = false
+            }
+            var searchRideId:String? = nil
+            if self.onMyRide {
+                searchRideId = UserModel.userModel.currentUser?.joinedRideID
+            }
+            viewModel.filterUserList(userList: users, searchTerm: "", searchRideId: searchRideId, searchRideLevel: nil)
         }
                         
         .onReceive(app.$userMessage) {msg in

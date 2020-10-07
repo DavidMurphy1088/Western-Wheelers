@@ -8,13 +8,13 @@ class LeaderStatsLoader: ObservableObject {
     //var error_msg: String? = nil
     public let data_was_loaded = PassthroughSubject<Int?, Never>()
     
-    func notifyObservers(count: Int? = nil, userMsg: String? = nil) {
+    func notifyObservers(count: Int? = nil, context: String? = nil) {
         // nil means not loaded to view, not nil is the number of rides and can be zero
         if (count != nil) {
             data_was_loaded.send(count!)
         } else {
             data_was_loaded.send(nil)
-            Util.app().reportError(class_type: type(of: self), usrMsg: userMsg)
+            Util.app().reportError(class_type: type(of: self), context: context ?? "")
         }
     }
     
@@ -32,14 +32,14 @@ class LeaderStatsLoader: ObservableObject {
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             
             if error != nil {
-                self.notifyObservers(userMsg: "Internet connection not available")
+                self.notifyObservers(context: "Internet connection not available")
                 return
             }
             
             // Read HTTP Response Status code
             if let response = response as? HTTPURLResponse {
                 if response.statusCode != 200 {
-                    self.notifyObservers(userMsg: "Web site not available")
+                    self.notifyObservers(context: "Web site not available")
                     return
                 }
             }
@@ -81,18 +81,18 @@ class LeaderStatsLoader: ObservableObject {
                         self.notifyObservers(count: count)
                     }
                     else {
-                        self.notifyObservers(userMsg: "zero rows of leader stats")
+                        self.notifyObservers(context: "zero rows of leader stats")
                     }
 
                 } catch Exception.Error( _, let message) {
-                    self.notifyObservers(userMsg: message)
+                    self.notifyObservers(context: message)
                 }
                 catch {
-                    self.notifyObservers(userMsg: "Cannot load stats")
+                    self.notifyObservers(context: "Cannot load leader stats")
                 }
             }
             else {
-                self.notifyObservers(userMsg: "Cannot parse stats html")
+                self.notifyObservers(context: "Cannot parse leader stats html")
             }
         }
         task.resume()

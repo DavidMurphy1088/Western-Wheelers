@@ -57,6 +57,7 @@ class JoinModel: ObservableObject {
 }
 
 struct RideJoinView: View {
+    @Binding var onRideFilterOn:Bool
     @ObservedObject var model = UserModel.userModel
     @ObservedObject var joinModel = JoinModel()
     
@@ -71,11 +72,18 @@ struct RideJoinView: View {
         let user = User(user: UserModel.userModel.currentUser!)
         if let ride = ride {
             //let ride = self.joinModel.joinRides[index]
+//            let changedRides = (user.joinedRideID != ride.ride.rideId) || (user.joinedRideLevel != ride.level)
+//            print (user.joinedRideID, ride.ride.rideId, onRideFilterOn, "cahnged", changedRides)
+//            if (user.joinedRideID != ride.ride.rideId) ||
+                //(user.joinedRideLevel != ride.level) {
+                onRideFilterOn = false
+            //}
             user.joinedRideID = ride.ride.rideId
             user.joinedRideLevel = ride.level
             user.joinedRideDate = Date()
         }
         else {
+            onRideFilterOn = false
             user.joinedRideID = nil
             user.joinedRideLevel = nil
             user.joinedRideDate = Date()

@@ -160,7 +160,7 @@ extension RidesLoader: XMLParserDelegate {
     }
 
     func parser(_ parser: XMLParser, parseErrorOccurred parseError: Error) {
-        Util.app().reportError(class_type: type(of: self), usrMsg: "XML parsing error", error: "parse error")
+        Util.app().reportError(class_type: type(of: self), context: "XML parsing error", error: "parse error")
     }
 }
 
