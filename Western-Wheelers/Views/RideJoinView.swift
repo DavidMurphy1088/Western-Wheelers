@@ -58,7 +58,6 @@ class JoinModel: ObservableObject {
 
 struct RideJoinView: View {
     @Binding var onRideFilterOn:Bool
-    @ObservedObject var model = UserModel.userModel
     @ObservedObject var joinModel = JoinModel()
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
@@ -71,26 +70,20 @@ struct RideJoinView: View {
     func saveJoin(ride: JoinedRide?) {
         let user = User(user: UserModel.userModel.currentUser!)
         if let ride = ride {
-            //let ride = self.joinModel.joinRides[index]
-//            let changedRides = (user.joinedRideID != ride.ride.rideId) || (user.joinedRideLevel != ride.level)
-//            if (user.joinedRideID != ride.ride.rideId) ||
-                //(user.joinedRideLevel != ride.level) {
-                onRideFilterOn = false
-            //}
             user.joinedRideID = ride.ride.rideId
             user.joinedRideLevel = ride.level
             user.joinedRideDate = Date()
         }
         else {
-            onRideFilterOn = false
             user.joinedRideID = nil
             user.joinedRideLevel = nil
             user.joinedRideDate = Date()
         }
+        onRideFilterOn = false
+        ProfileListModel.model.clearRideFilter()
 
         UserModel.userModel.setCurrentUser(user: user)
         user.saveProfile()
-        //self.isPresented = false
         self.presentationMode.wrappedValue.dismiss()
     }
     
@@ -181,7 +174,6 @@ struct RideJoinView: View {
             }
             appearCount += 1
         }
-
     }
 
 }

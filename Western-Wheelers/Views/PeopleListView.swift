@@ -2,24 +2,78 @@ import SwiftUI
 import UIKit
 import Combine
 import os.log
-//import FBSDKLoginKit
-//import FBSDKShareKit
-//import FBSDKCoreKit
 import CloudKit
 
-class PeopleListModel : ObservableObject {
-    static var model = PeopleListModel() //singleton
-    @Published var viewUserList:[User] = []
+class ProfileListModel : ObservableObject {
+    static var model = ProfileListModel() //singleton
+    
+    //the list published to views
+    @Published var profileList:[User]? // = []
+    
+    //subscribe to changes in the profile list
+    //user may have saved or deleted their profile (which causes the model to reload all users. e.g to have the new profile show if the user added one profile)
+    private var profileListSubscriber:AnyCancellable? = nil
+    
+    private var profiles:[User]? = nil
+    private var searchTerm:String?
+    private var searchRideId:String?
+    private var searchRideLevel:String?
+    private var refreshEnabled = false
+    private var loadNum = 0
+    
+    let refreshQueue = DispatchQueue(label: "profile.loader")
     
     init () {
         //preload query to speed up Cloudkit. Its sometimes unusable slow for profiles
         //this query runs when app loads so before the view appears
         UserModel.userModel.loadAllUsers(warmup: true)
+        
+        //listen for profile changes
+        self.profileListSubscriber = UserModel.userModel.userProfileListSubject.sink(receiveValue: { profilesSink in
+            print("===profiles received", self.loadNum, "cnt:", profilesSink?.count)
+            self.profiles = profilesSink
+            self.filterUserList()
+        })
+        
+        refreshQueue.async {
+            let waitTimeSeconds = 5 //1/2 hour //TODO
+            while true {
+                print("----Start refresh profiles", self.loadNum)
+                if self.refreshEnabled {
+                    UserModel.userModel.loadAllUsers()
+                    self.loadNum += 1
+                }
+                sleep(UInt32(waitTimeSeconds)) //dont remove sleep
+            }
+        }
     }
     
-    func filterUserList(userList: [User], searchTerm: String, searchRideId: String?, searchRideLevel:String?) {
+    func loadProfiles() {
+        UserModel.userModel.loadAllUsers()
+    }
+    
+    func enableRefresh(way:Bool) {
+        self.refreshEnabled = way
+    }
+    
+    func setFilter(searchTerm: String, searchRideId: String?, searchRideLevel:String?) {
+        self.searchTerm = searchTerm
+        self.searchRideId = searchRideId
+        self.searchRideLevel = searchRideLevel
+    }
+    
+    func clearRideFilter() {
+        self.searchRideId = nil
+        self.searchRideLevel = nil
+        self.refreshEnabled = false
+    }
+
+    func filterUserList() {
+        guard let profiles = self.profiles else {
+            return
+        }
         var filterList:[User] = []
-        for user in userList {
+        for user in profiles {
             if let searchId = searchRideId {
                 if user.joinedRideID != searchId {
                     continue
@@ -32,26 +86,30 @@ class PeopleListModel : ObservableObject {
             }
 
             var show = true
-            if searchTerm != "" {
-                show = false
-                if (user.nameFirst?.uppercased().contains(searchTerm.uppercased()))! {
-                    show = true
-                }
-                if (user.nameLast?.uppercased().contains(searchTerm.uppercased()))! {
-                    show = true
+            if let term = searchTerm {
+                if term != "" {
+                    show = false
+                    if (user.nameFirst?.uppercased().contains(term.uppercased()))! {
+                        show = true
+                    }
+                    if (user.nameLast?.uppercased().contains(term.uppercased()))! {
+                        show = true
+                    }
                 }
             }
             if show {
                 filterList.append(user)
             }
         }
-        self.viewUserList = filterList
+        DispatchQueue.main.async {
+            self.profileList = filterList
+        }
     }
 }
 
 struct PeopleListView: View {
-    @ObservedObject var model = UserModel.userModel
-    @ObservedObject var viewModel = PeopleListModel.model
+    @ObservedObject var userModel = UserModel.userModel
+    @ObservedObject var profileListModel = ProfileListModel.model
     @ObservedObject var app = Util.app()
 
     @State var searchTerm = ""
@@ -87,25 +145,29 @@ struct PeopleListView: View {
             self.searchTerm
         }, set: {
             self.searchTerm = $0
-            viewModel.filterUserList(userList: UserModel.userModel.userProfileList!, searchTerm: self.searchTerm,
+            profileListModel.setFilter(searchTerm: self.searchTerm,
                                      searchRideId: self.onMyRide ? UserModel.userModel.currentUser!.joinedRideID : nil,
                                      searchRideLevel: self.onMyRide ? UserModel.userModel.currentUser!.joinedRideLevel : nil)
+            profileListModel.filterUserList()
         })
 
         let onMyRide = Binding<Bool>(get: {
             self.onMyRide
         }, set: {
             self.onMyRide = $0
-            viewModel.filterUserList(userList: UserModel.userModel.userProfileList!, searchTerm: self.searchTerm,
+            //get a fresh list of users on this ride, maybe people joined or left
+            self.profileListModel.enableRefresh(way: self.onMyRide)
+            profileListModel.setFilter(searchTerm: self.searchTerm,
                                      searchRideId: self.onMyRide ? UserModel.userModel.currentUser!.joinedRideID : nil,
                                      searchRideLevel: self.onMyRide ? UserModel.userModel.currentUser!.joinedRideLevel : nil)
+            self.profileListModel.loadProfiles()
         })
 
         //must be navigation view to allow NAv links below to work
         return NavigationView {
             GeometryReader { geometry in
                 VStack {
-                    if UserModel.userModel.userProfileList == nil  {
+                    if self.profileListModel.profileList == nil  {
                         VStack {
                             ActivityIndicator().frame(width: 50, height: 50)
                         }.foregroundColor(Color.blue)
@@ -123,7 +185,7 @@ struct PeopleListView: View {
                             .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.blue, lineWidth: 1))
                         }
                         HStack {
-                            Text("Seach")
+                            Text("Search")
                             TextField("", text: searchBinding, onEditingChanged: {(editingChanged) in})
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .frame(width: geometry.size.width * 0.5)
@@ -138,13 +200,11 @@ struct PeopleListView: View {
                         .frame(width: geometry.size.width * 0.5)
                         
                         //sometimes the email search results come after the list results and so the current user show blank in the list - this attempts to fix that
-                        //List(self.filteredUsers()) { user in
-                        List(self.viewModel.viewUserList) { user in
-                            //ForEach(UserModel.userModel.userList!) { user in
-
+                        List(self.profileListModel.profileList!, id: \.id) { user in
+                        //ForEach(self.profileListModel.profileList!) { user in
                             if let recId = user.recordId {
                                 NavigationLink(destination: PersonView(recordId: recId)) {
-                                    Text("\((user.nameFirst ?? UserModel.userModel.currentUser?.nameFirst)!) \(user.nameLast ?? "")")
+                                    Text("\(user.nameFirst ?? "") \(user.nameLast ?? "")")
                                 }
                             }
                         }
@@ -157,11 +217,11 @@ struct PeopleListView: View {
                                 }
                             }
 
-                            NavigationLink(destination: ProfileEditView(isPresented: $showProfile), isActive: $showProfile) {
+                            NavigationLink(destination: ProfileEditView(isPresented: $showProfile, onRideFilterOn: $onMyRide), isActive: $showProfile) {
                                 Text("My Profile")
                             }
                             .padding()
-                            .disabled(model.currentUser == nil)
+                            .disabled(userModel.currentUser == nil)
 
                             NavigationLink(destination: RideJoinView(onRideFilterOn: $onMyRide, joinedRide: UserModel.userModel.currentUser?.joinedRideID,
                                                                      joinedRideLevel: UserModel.userModel.currentUser?.joinedRideLevel),
@@ -203,6 +263,7 @@ struct PeopleListView: View {
         }
             
         .onAppear() {
+            print("APPEARED======")
             // appears when view appears first time or when navigating from another tab. Therefore may be called > 1.
             // It is *NOT* called when a view navigated to from here returns.
             if let fileURL = Bundle.main.url(forResource: "doc_person_info", withExtension: "txt") {
@@ -218,8 +279,15 @@ struct PeopleListView: View {
                 // for some unfathomable reason the .onrec from the 1st has a userlist = nil (but the users coming back >0 users)
                 //UserModel.userModel.searchUserByEmail(email: user.email!)
             }
+            
+            self.profileListModel.enableRefresh(way: self.onMyRide)
             // do it every time the view appears to get latest data
-            UserModel.userModel.loadAllUsers()
+            self.profileListModel.loadProfiles()
+        }
+        
+        .onDisappear {
+            print("DISAPPEARED======")
+            self.profileListModel.enableRefresh(way: false)
         }
         
         .onReceive(UserModel.userModel.$emailSearchUser) {user in
@@ -233,19 +301,19 @@ struct PeopleListView: View {
             }
         }
         
-        .onReceive(UserModel.userModel.$userProfileList) {users in
+        .onReceive(profileListModel.$profileList) {profiles in
             //user may have saved or deleted their profile (which causes the model to reload all users. e.g to have the new profile show if the user added one profile)
-            guard let users = users else {
-                return
-            }
+//            guard let users = profiles else {
+//                return
+//            }
             if !self.userHasProfile() {
                 self.onMyRide = false
             }
-            var searchRideId:String? = nil
-            if self.onMyRide {
-                searchRideId = UserModel.userModel.currentUser?.joinedRideID
-            }
-            viewModel.filterUserList(userList: users, searchTerm: "", searchRideId: searchRideId, searchRideLevel: nil)
+//            var searchRideId:String? = nil
+//            if self.onMyRide {
+//                searchRideId = UserModel.userModel.currentUser?.joinedRideID
+//            }
+//            viewModel.filterUserList(userList: users, searchTerm: "", searchRideId: searchRideId, searchRideLevel: nil)
         }
                         
         .onReceive(app.$userMessage) {msg in

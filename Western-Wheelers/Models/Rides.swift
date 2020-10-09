@@ -17,7 +17,7 @@ class Rides : ObservableObject {
     let weatherLoader = WeatherAPI()
     let statsLoader = StatsLoader()
 
-    var notifiedRideLoaded:AnyCancellable? = nil
+    var notifiedRidesLoaded:AnyCancellable? = nil
     var notifiedWeatherLoaded:AnyCancellable? = nil
     var imageLoadedCancel = [AnyCancellable]()
 
@@ -115,7 +115,7 @@ class Rides : ObservableObject {
     
     func loadRides() {
         //cannot tell whether rides or weather will load first
-        self.notifiedRideLoaded = self.rideLoadedCount.sink(receiveValue: { value in
+        self.notifiedRidesLoaded = self.rideLoadedCount.sink(receiveValue: { value in
             self.rideCount = value
             if !self.weatherApplied {
                 self.applyWeather()

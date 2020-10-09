@@ -111,6 +111,7 @@ struct ImagePicker: UIViewControllerRepresentable {
 
 struct ProfileEditView: View {
     @Binding var isPresented:Bool
+    @Binding var onRideFilterOn:Bool
     @ObservedObject var model = UserModel.userModel
     @ObservedObject var app = Util.app()
     @ObservedObject var fbmanager = UserLoginManager()
@@ -133,6 +134,12 @@ struct ProfileEditView: View {
 
     func setImage(image:UIImage) {
         UserModel.userModel.currentUser?.picture = image
+    }
+    
+    func turnOffOnRideFilter() {
+        //turn off onRide filter UI toggle and model filter when profile deleted
+        onRideFilterOn = false
+        ProfileListModel.model.clearRideFilter()
     }
     
     var isLandscape: Bool {
@@ -339,6 +346,7 @@ struct ProfileEditView: View {
                         //can keep local email, name etc to save them signing into WW again
                         self.showAlert = false
                         self.alertType = .none
+                        self.turnOffOnRideFilter()
                         self.isPresented = false
                     }, secondaryButton: .cancel(){
                         self.showAlert = false

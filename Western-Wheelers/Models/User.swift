@@ -5,6 +5,7 @@ import CoreLocation
 import SwiftUI
 import os.log
 import CloudKit
+import Combine
 
 class UserModel : ObservableObject {
     static let defaults = UserDefaults.standard
@@ -12,9 +13,12 @@ class UserModel : ObservableObject {
     static var userModel = UserModel() //singleton
     
     @Published private(set) var currentUser:User? = nil // created when user signs into WW, exists when apps find data in localUserModel.defaults at startup, ceases to exist when user deletes their profile
-    @Published private(set) var userProfileList:[User]? = nil
     @Published private(set) var fetchedIDUser:User? = nil
     @Published private(set) var emailSearchUser:User? = nil
+
+    //@Published
+    //private(set) var userProfileList:[User]? = nil
+    public let userProfileListSubject = PassthroughSubject<[User]?, Never>()
 
     init() {
         if let _ = UserModel.defaults.string(forKey: "email") {
@@ -30,9 +34,11 @@ class UserModel : ObservableObject {
         let sortedUsers = loaded.sorted {
             ($0.nameLast ?? "") < ($1.nameLast ?? "")
         }
+        //self.userProfileList = sortedUsers
         DispatchQueue.main.async {
-            self.userProfileList = sortedUsers
+            self.userProfileListSubject.send(sortedUsers)
         }
+        
     }
     
     public func loadAllUsers(warmup:Bool = false) {
@@ -177,9 +183,7 @@ class UserModel : ObservableObject {
         
 }
 
-class User : ObservableObject, Identifiable { //: NSObject, Identifiable, CLLocationManagerDelegate, ObservableObject {
-    //@Published var locationUpdateCount = 0 // tell listeners to update
-    //@Published var userLoaded:User? = nil
+class User : ObservableObject, Identifiable { 
     
     // The value of identifierForVendor is the same for apps that come from the same vendor running on the same device
     // e.g. if the app is deleted and re-installed the device id changes..
