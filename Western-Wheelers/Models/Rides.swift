@@ -8,22 +8,24 @@ class Rides : ObservableObject {
     
     @Published var rides:[Ride] = []//()
     @Published var publishedTotalRides: Int? = nil
-    
+    @Published var lastLoadDate:Date?
+    @Published var loadCounts = 0
+
     public let rideLoadedCount = PassthroughSubject<Int?, Never>()
 
-    let rides_loader = RidesLoader()
+    let ridesLoader = RidesLoader()
     let weatherLoader = WeatherAPI()
-    let stats_loader = StatsLoader()
+    let statsLoader = StatsLoader()
 
-    var notified_ride_loaded:AnyCancellable? = nil
-    var notified_weather_loaded:AnyCancellable? = nil
-    var image_loaded_cancel = [AnyCancellable]()
+    var notifiedRideLoaded:AnyCancellable? = nil
+    var notifiedWeatherLoaded:AnyCancellable? = nil
+    var imageLoadedCancel = [AnyCancellable]()
 
     var rideCount: Int? = nil;
     var weatherImages = [String: ImageLoader]()
     var weatherDayData = [Date: WeatherAPI.DayWeather]()
     var weatherApplied = false
-    
+
     // other (than View) classes can subsribe to this to be notified of data changes. Views can use the published data state
     //public let data_was_loaded = PassthroughSubject<Rides, Never>()
 
@@ -38,6 +40,8 @@ class Rides : ObservableObject {
         DispatchQueue.main.async {
             Rides.inst?.rides = ridesLoaded
             Rides.inst?.publishedTotalRides = ridesLoaded.count
+            Rides.inst?.lastLoadDate = Date()
+            Rides.inst?.loadCounts += 1
             self.rideLoadedCount.send(ridesLoaded.count)
         }
     }
@@ -65,7 +69,6 @@ class Rides : ObservableObject {
                     ride.weather_pressure = day_weather!.pressure
                     ride.weather_description = day_weather!.weather[0].description
                     ride.weather_main = day_weather!.weather[0].main
-                    print (ride.dateDisp(), ride.weather_day, "Max", ride.weather_max, ride.weather_main)
                     if ride.weather_main != nil {
                         ride.weatherDisp = "  \(ride.weather_main!) \(String(format: "%.0f", ride.weather_day!))°  "
                         applied += 1
@@ -97,10 +100,22 @@ class Rides : ObservableObject {
         }
     }
     
+    func startRideLoader() {
+        let serialQueue = DispatchQueue(label: "ride.loader")
+
+        serialQueue.async {
+            let waitTimeSeconds = 30 * 60 //1/2 hour
+            //let waitTimeSeconds = 5 //1/2 hour
+            while true {
+                self.loadRides()
+                sleep(UInt32(waitTimeSeconds)) //dont remove sleep
+            }
+        }
+    }
+    
     func loadRides() {
         //cannot tell whether rides or weather will load first
-        
-        self.notified_ride_loaded = self.rideLoadedCount.sink(receiveValue: { value in
+        self.notifiedRideLoaded = self.rideLoadedCount.sink(receiveValue: { value in
             self.rideCount = value
             if !self.weatherApplied {
                 self.applyWeather()
@@ -112,7 +127,7 @@ class Rides : ObservableObject {
             }
         })
 
-        self.notified_weather_loaded = weatherLoader.weatherDaysLoaded.sink(receiveValue: { value in
+        self.notifiedWeatherLoaded = weatherLoader.weatherDaysLoaded.sink(receiveValue: { value in
             self.loadWeather()
             if self.rideCount != nil {
                 self.applyWeather()
@@ -121,11 +136,10 @@ class Rides : ObservableObject {
         })
 
         weatherLoader.load()
-        //rides_loader.loadRides()
         WAApi.instance().loadRides() 
     }
     
-    func get_rides_by_level(level: String?) -> [Ride] {
+    func getRidesByLevel(level: String?) -> [Ride] {
         var ride_list = [Ride]()
         for ride in rides {
             if level == nil || ride.getLevels().contains(String(level!)) {
@@ -135,7 +149,7 @@ class Rides : ObservableObject {
         return ride_list
     }
     
-    func get_rides_by_ride_id(rid: String) -> Ride? {
+    func getRidesByRideId(rid: String) -> Ride? {
         for ride in rides {
             if ride.rideId == rid {
                 return ride
@@ -144,7 +158,7 @@ class Rides : ObservableObject {
         return nil
     }
     
-    func get_rides_by_description(search_desc: String) -> [Ride] {
+    func getRidesByDescription(search_desc: String) -> [Ride] {
         var ride_list = [Ride]()
         let look_for = search_desc.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
         for ride in rides {

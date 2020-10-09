@@ -8,7 +8,8 @@ struct ContentView: View {
     @State var searchActive = false
     
     init () {
-        ridesModel.loadRides()
+        //ridesModel.loadRides()
+        ridesModel.startRideLoader()
     }
 
     var contents: some View {
@@ -29,12 +30,7 @@ struct ContentView: View {
                 Text("People")
                 Image("tab-icon-people")
                 }}//.padding().tag(1)
-            
-//            TestView().tabItem { VStack {
-//                Text("Rider Stats")
-//                Image("tab-icon-stats")
-//            }}//.padding().tag(2)
-            
+                        
             RiderStatisticsView().tabItem { VStack {
                 Text("Rider Stats")
                 Image("tab-icon-stats")

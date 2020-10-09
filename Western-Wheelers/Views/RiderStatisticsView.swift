@@ -83,7 +83,7 @@ struct RiderStatisticsView: View {
         .onAppear() {
             if self.statsModel.stats_by_rider.count == 0 {
                 // for some reason this init is called > 1
-                self.statsModel.load_stats()
+                self.statsModel.loadStats()
             }
             if let user = UserModel.userModel.currentUser {
                 self.statsModel.pickRider(name_last: user.nameLast, name_first: user.nameFirst)

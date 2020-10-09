@@ -116,17 +116,15 @@ class Ride : Identifiable, Equatable, ObservableObject  {
     }
 
     func dateDisp() -> String {
-//        let df = DateFormatter()
-//        df.dateFormat = "yyyy-MM-dd HH:mm:ssz"
-//        //df.timeZone = TimeZone(abbreviation: "UTC")
-//        return df.string(from: dateTime)
         let formatter = DateFormatter() // this formats the day,time according to users local timezone
         formatter.dateFormat = "EEEE MMM d"
         let dayDisp = formatter.string(from: self.dateTime)
-        formatter.dateFormat = "HH:mm"
-        //let hhmm = formatter.string(from: self.dateTime)
-        //let dayDisp = day + ", " + hhmm
-        formatter.dateFormat = "h:mm a"
+        
+        // force 12-hour format even if they have 24 hour set on phone
+        let timeFmt = "h:mm a"
+        formatter.setLocalizedDateFormatFromTemplate(timeFmt)
+        formatter.dateFormat = timeFmt
+        formatter.locale = Locale(identifier: "en_US")
         let timeDisp = formatter.string(from: self.dateTime)
         return dayDisp + ", " + timeDisp
     }
@@ -163,21 +161,17 @@ class Ride : Identifiable, Equatable, ObservableObject  {
             return
         }
         DispatchQueue.global().async {
-            self.html_parse()
+            self.htmlParse()
         }
     }
     
-    func html_analyse() {
+    func htmlAnalyse() {
         DispatchQueue.main.async { // publishing cannot come from background thread
             self.htmlDetailWasLoaded = true
         }
     }
 
-    public func html_parse() {
-//        guard let url_str = self.WA_id else {
-//            Util.app().reportError(class_type: type(of: self), usrMsg: "Cannot load ride details from html page")
-//            return
-//        }
+    public func htmlParse() {
         let requestUrl = URL(string: "")
         var request = URLRequest(url: requestUrl!)
         request.httpMethod = "GET"
@@ -233,7 +227,7 @@ class Ride : Identifiable, Equatable, ObservableObject  {
                 Util.app().reportError(class_type: type(of: self), context: "No ride HTML data", error: msg)
             }
             
-            self.html_analyse()
+            self.htmlAnalyse()
         }
         task.resume()
     }
@@ -307,25 +301,12 @@ class Ride : Identifiable, Equatable, ObservableObject  {
                     }
 
                     for char in wordPart {
-//                        if char == "+" || char == "-" {
-//                            //levels += String(char)
-//                            levels.append(String(char))
-//                        }
+
                         if char >= "A" && char <= "E" {
                             levels.append(String(char))
-//                            let lvl = String(char)
-//                            if levels.count == 0 {
-//                                levels = lvl
-//                            }
-//                            else {
-//                                levels = levels + "," + lvl
-//                            }
                         }
                     }
                 }
-            }
-            else {
-                //titleShort = titleShort! + " " + word
             }
         }
         return levels

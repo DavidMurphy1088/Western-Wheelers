@@ -6,10 +6,6 @@ struct ActivityIndicator: View {
     var body1: some View {
         Text("wait...")
     }
-
-//    func scaleEffect(geometry: GeometryProxy) -> View {
-//        return scaleEffect(!self.isAnimating ? 1 - CGFloat(index) / 5 : 0.2 + CGFloat(index) / 5)
-//    }
     
     var body: some View {
         GeometryReader { (geometry: GeometryProxy) in

@@ -20,7 +20,7 @@ class StatsLoader: ObservableObject {
         }
     }
     
-    public func load_stats() {
+    public func loadStats() {
         let fmt = DateFormatter()
         fmt.dateFormat = "yy"
         let year = fmt.string(from: Date())

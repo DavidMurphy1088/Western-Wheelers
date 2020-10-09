@@ -348,19 +348,6 @@ struct ProfileEditView: View {
             return Alert(title: Text("No alert"))
         }
 
-//        .onReceive(UserModel.userModel.$currentUser) { user in
-//            //WW Api notified sign in of new created user since user just signed into WW and we have email, name
-//            if let user = user {
-//                self.profileUser = ProfileUser()
-//                self.profileUser.email = user.email
-//                self.profileUser.nameFirst = user.nameFirst
-//                self.profileUser.nameLast = user.nameLast
-//                //they may have a profile. e.g. deleted app and re-installing
-//                self.queryRunning = true
-//                UserModel.userModel.searchUserByEmail(email: self.profileUser.email!)
-//            }
-//        }
-
         .onAppear() {
             if let user = UserModel.userModel.currentUser {
                 self.queryRunning = true

@@ -15,21 +15,20 @@ struct RideSetView: View {
 
     func getRides () {
         if let ride_level = level {
-            rides = Rides.instance().get_rides_by_level(level: ride_level.name == "All" ? nil : ride_level.name)
+            rides = Rides.instance().getRidesByLevel(level: ride_level.name == "All" ? nil : ride_level.name)
             title = ride_level.name
         }
         else {
             if let search_term = search {
-                rides = Rides.instance().get_rides_by_description(search_desc: search_term)
+                rides = Rides.instance().getRidesByDescription(search_desc: search_term)
                 title = search ?? ""
             }
             else {
-                rides = Rides.instance().get_rides_by_level(level: nil)
+                rides = Rides.instance().getRidesByLevel(level: nil)
                 title = ""
             }
         }
     }
-    
     
     func rideColor(ride:Ride) -> Color {
         let status = ride.activeStatus()

@@ -8,15 +8,6 @@ struct PersonView: View {
     @State var recordId:CKRecord.ID
     @State var userForView:User?
     
-//    var body1: some View {
-//        NavigationView { //but creates yet more unwanted space at top of view
-//        GeometryReader { geometry in
-//        Text("TEST")
-//        }
-//        .alignmentGuide(HorizontalAlignment.center) { _ in  0 }
-//        }
-//    }
-    
     var body: some View {
         NavigationView { //required but creates yet more unwanted space at top of view
             //Geo reader here seems to force everything left on the screen. Seems like a SwiftUI bug?

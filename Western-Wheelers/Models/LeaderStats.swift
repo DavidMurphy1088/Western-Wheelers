@@ -30,7 +30,7 @@ class LeadersStats : ObservableObject {
                 self.published_sorted = self.stats_by_leader.count
             }
         })
-        LeaderStatsLoader.instance.load_stats()
+        LeaderStatsLoader.instance.loadStats()
     }
     
     func sort(by_column:Int) {

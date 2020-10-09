@@ -71,20 +71,20 @@ class WAApi : ObservableObject {
             if let perms = data["Permissions"] as? [[String: Any]] {
                 for perm in perms {
                     let id = perm["AccountId"] as! NSNumber
-                    //let url = "https://api.wildapricot.org/publicview/v1/accounts/\(id)/contacts/me"
-                    //let url = "https://api.wildapricot.org/v2.2/accounts/\(id)/events" //?%24async=true"
-                    //let url = "https://api.wildapricot.org/v2.2/accounts/41275/events?%24async=true"
-                    //let url = "https://api.wildapricot.org/publicview/v1/accounts/41275/eventregistrations"
-                    //let url = "https://api.wildapricot.org/publicview/v1/accounts/41275/contactfields"
-                    //url = "https://api.wildapricot.org/v2.2/accounts/\(id)/events"
                     var url = ""
                     if apiType == ApiType.LoadRides {
+                        //let url = "https://api.wildapricot.org/publicview/v1/accounts/\(id)/contacts/me"
+                        //let url = "https://api.wildapricot.org/v2.2/accounts/\(id)/events" //?%24async=true"
+                        //let url = "https://api.wildapricot.org/v2.2/accounts/41275/events?%24async=true"
+                        //let url = "https://api.wildapricot.org/publicview/v1/accounts/41275/eventregistrations"
+                        //let url = "https://api.wildapricot.org/publicview/v1/accounts/41275/contactfields"
+                        //url = "https://api.wildapricot.org/v2.2/accounts/\(id)/events"
                         // FROM their support https://api.wildapricot.org/v2.1/accounts/{ACCOUNT_ID}/contacts?$async=false&$filter='Membership level ID' eq {LEVEL_ID}
                         // from Swagger https://api.wildapricot.org/publicview/v1/accounts/41275/events?%24filter=%24filter%3DIsUpcoming%20eq%20false
 
                         //url = "https://api.wildapricot.org/publicview/v1/accounts/41275/events?%24filter=%24filter%3DIsUpcoming%20eq%20false"
-                        //url = "https://api.wildapricot.org/publicview/v1/accounts/\(id)/events" //?%24filter=%24filter%3DIsUpcoming%20eq%20false"
-                        url = "https://api.wildapricot.org/publicview/v1/accounts/\(id)/events" //?%24filter=%24filter%3DStartDate%20gt%202016-011-02"
+                        url = "https://api.wildapricot.org/publicview/v1/accounts/\(id)/events" //?%24filter=%24filter%3DIsUpcoming%20eq%20false"
+                        //url = "https://api.wildapricot.org/publicview/v1/accounts/\(id)/events?$filter=$filter%3DStartDate%20gt%202016-011-02"
                         apiCall(path: url, withToken: true, usrMsg: usrMsg, completion: parseRides, apiType: apiType, tellUsers: tellUsers)
                     }
                     if apiType == ApiType.AuthenticateUser {

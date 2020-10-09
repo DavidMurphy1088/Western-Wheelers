@@ -73,7 +73,6 @@ struct RideJoinView: View {
         if let ride = ride {
             //let ride = self.joinModel.joinRides[index]
 //            let changedRides = (user.joinedRideID != ride.ride.rideId) || (user.joinedRideLevel != ride.level)
-//            print (user.joinedRideID, ride.ride.rideId, onRideFilterOn, "cahnged", changedRides)
 //            if (user.joinedRideID != ride.ride.rideId) ||
                 //(user.joinedRideLevel != ride.level) {
                 onRideFilterOn = false

@@ -22,6 +22,7 @@
 		7B510E95252B9BB30056F858 /* RideLevelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B510E94252B9BB30056F858 /* RideLevelsView.swift */; };
 		7B510EA4252B9BFA0056F858 /* QuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B510EA3252B9BFA0056F858 /* QuizView.swift */; };
 		7B5DE41A252AC74C0054853B /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 7B5DE419252AC74C0054853B /* Podfile */; };
+		7B8C076B252F918100620697 /* RiderStatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8C076A252F918100620697 /* RiderStatisticsView.swift */; };
 		7BD1B36D252ACA6F003FBA2E /* RideSetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD1B36C252ACA6F003FBA2E /* RideSetView.swift */; };
 		7BD1B373252ACADC003FBA2E /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD1B372252ACADC003FBA2E /* Util.swift */; };
 		7BD1B380252ACB85003FBA2E /* CloudKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD1B37F252ACB85003FBA2E /* CloudKitManager.swift */; };
@@ -35,7 +36,6 @@
 		7BF39066252AC8E0001CD41E /* RidersStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF39052252AC8E0001CD41E /* RidersStats.swift */; };
 		7BF39067252AC8E0001CD41E /* WeatherAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF39053252AC8E0001CD41E /* WeatherAPI.swift */; };
 		7BF39068252AC8E0001CD41E /* api_keys.txt in Resources */ = {isa = PBXBuildFile; fileRef = 7BF39054252AC8E0001CD41E /* api_keys.txt */; };
-		7BF39069252AC8E0001CD41E /* RiderStatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF39055252AC8E0001CD41E /* RiderStatisticsView.swift */; };
 		7BF3906A252AC8E0001CD41E /* StatsLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF39056252AC8E0001CD41E /* StatsLoader.swift */; };
 		7BF3906B252AC8E0001CD41E /* RidersTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF39057252AC8E0001CD41E /* RidersTracker.swift */; };
 		7BF3906C252AC8E0001CD41E /* Rides.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF39058252AC8E0001CD41E /* Rides.swift */; };
@@ -50,7 +50,6 @@
 		7BF39084252AC90F001CD41E /* PersonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF3907B252AC90F001CD41E /* PersonView.swift */; };
 		7BF39085252AC90F001CD41E /* ActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF3907C252AC90F001CD41E /* ActivityIndicator.swift */; };
 		7BF39086252AC90F001CD41E /* LeaderStatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF3907D252AC90F001CD41E /* LeaderStatisticsView.swift */; };
-		7BF39087252AC90F001CD41E /* SimpleTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF3907E252AC90F001CD41E /* SimpleTest.swift */; };
 		7BF39088252AC90F001CD41E /* MultiLineTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF3907F252AC90F001CD41E /* MultiLineTextView.swift */; };
 		7BF39089252AC90F001CD41E /* PeopleListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF39080252AC90F001CD41E /* PeopleListView.swift */; };
 		7BF3908A252AC90F001CD41E /* RideJoinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF39081252AC90F001CD41E /* RideJoinView.swift */; };
@@ -100,6 +99,7 @@
 		7B510E94252B9BB30056F858 /* RideLevelsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RideLevelsView.swift; sourceTree = "<group>"; };
 		7B510EA3252B9BFA0056F858 /* QuizView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuizView.swift; sourceTree = "<group>"; };
 		7B5DE419252AC74C0054853B /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		7B8C076A252F918100620697 /* RiderStatisticsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RiderStatisticsView.swift; sourceTree = "<group>"; };
 		7BD1B36C252ACA6F003FBA2E /* RideSetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RideSetView.swift; sourceTree = "<group>"; };
 		7BD1B372252ACADC003FBA2E /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		7BD1B37F252ACB85003FBA2E /* CloudKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitManager.swift; sourceTree = "<group>"; };
@@ -113,7 +113,6 @@
 		7BF39052252AC8E0001CD41E /* RidersStats.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RidersStats.swift; sourceTree = "<group>"; };
 		7BF39053252AC8E0001CD41E /* WeatherAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeatherAPI.swift; sourceTree = "<group>"; };
 		7BF39054252AC8E0001CD41E /* api_keys.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = api_keys.txt; sourceTree = "<group>"; };
-		7BF39055252AC8E0001CD41E /* RiderStatisticsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RiderStatisticsView.swift; sourceTree = "<group>"; };
 		7BF39056252AC8E0001CD41E /* StatsLoader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatsLoader.swift; sourceTree = "<group>"; };
 		7BF39057252AC8E0001CD41E /* RidersTracker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RidersTracker.swift; sourceTree = "<group>"; };
 		7BF39058252AC8E0001CD41E /* Rides.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Rides.swift; sourceTree = "<group>"; };
@@ -128,7 +127,6 @@
 		7BF3907B252AC90F001CD41E /* PersonView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonView.swift; sourceTree = "<group>"; };
 		7BF3907C252AC90F001CD41E /* ActivityIndicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivityIndicator.swift; sourceTree = "<group>"; };
 		7BF3907D252AC90F001CD41E /* LeaderStatisticsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LeaderStatisticsView.swift; sourceTree = "<group>"; };
-		7BF3907E252AC90F001CD41E /* SimpleTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleTest.swift; sourceTree = "<group>"; };
 		7BF3907F252AC90F001CD41E /* MultiLineTextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultiLineTextView.swift; sourceTree = "<group>"; };
 		7BF39080252AC90F001CD41E /* PeopleListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PeopleListView.swift; sourceTree = "<group>"; };
 		7BF39081252AC90F001CD41E /* RideJoinView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RideJoinView.swift; sourceTree = "<group>"; };
@@ -272,9 +270,9 @@
 				7B510EA3252B9BFA0056F858 /* QuizView.swift */,
 				7BF39081252AC90F001CD41E /* RideJoinView.swift */,
 				7B510E94252B9BB30056F858 /* RideLevelsView.swift */,
+				7B8C076A252F918100620697 /* RiderStatisticsView.swift */,
 				7BD1B36C252ACA6F003FBA2E /* RideSetView.swift */,
 				7B510E89252B9B4F0056F858 /* RideWebView.swift */,
-				7BF3907E252AC90F001CD41E /* SimpleTest.swift */,
 				7BF39082252AC90F001CD41E /* WWSignInView.swift */,
 			);
 			path = Views;
@@ -292,7 +290,6 @@
 				7BF3905F252AC8E0001CD41E /* Ride.swift */,
 				7BF39050252AC8E0001CD41E /* RideLevel.swift */,
 				7BF39052252AC8E0001CD41E /* RidersStats.swift */,
-				7BF39055252AC8E0001CD41E /* RiderStatisticsView.swift */,
 				7BF39057252AC8E0001CD41E /* RidersTracker.swift */,
 				7BF39058252AC8E0001CD41E /* Rides.swift */,
 				7BF39060252AC8E0001CD41E /* RidesLoader.swift */,
@@ -576,8 +573,8 @@
 				7B3A41BA252AC3C00095F169 /* SceneDelegate.swift in Sources */,
 				7BF3908C252AC90F001CD41E /* ProfileEditView.swift in Sources */,
 				7BF39066252AC8E0001CD41E /* RidersStats.swift in Sources */,
+				7B8C076B252F918100620697 /* RiderStatisticsView.swift in Sources */,
 				7BF39088252AC90F001CD41E /* MultiLineTextView.swift in Sources */,
-				7BF39069252AC8E0001CD41E /* RiderStatisticsView.swift in Sources */,
 				7BF39070252AC8E0001CD41E /* ImageLoader.swift in Sources */,
 				7BF3906C252AC8E0001CD41E /* Rides.swift in Sources */,
 				7BD1B36D252ACA6F003FBA2E /* RideSetView.swift in Sources */,
@@ -600,7 +597,6 @@
 				7BF3906E252AC8E0001CD41E /* WAApi.swift in Sources */,
 				7BF3908A252AC90F001CD41E /* RideJoinView.swift in Sources */,
 				7B510E95252B9BB30056F858 /* RideLevelsView.swift in Sources */,
-				7BF39087252AC90F001CD41E /* SimpleTest.swift in Sources */,
 				7BF39064252AC8E0001CD41E /* RideLevel.swift in Sources */,
 				7B3A41BF252AC3C00095F169 /* Western_Wheelers.xcdatamodeld in Sources */,
 				7BF39084252AC90F001CD41E /* PersonView.swift in Sources */,
@@ -777,7 +773,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "Western-Wheelers/Western-Wheelers.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 15;
 				DEVELOPMENT_ASSET_PATHS = "\"Western-Wheelers/Preview Content\"";
 				DEVELOPMENT_TEAM = 2B6A6N9QBQ;
 				ENABLE_PREVIEWS = YES;
@@ -803,7 +799,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "Western-Wheelers/Western-Wheelers.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 15;
 				DEVELOPMENT_ASSET_PATHS = "\"Western-Wheelers/Preview Content\"";
 				DEVELOPMENT_TEAM = 2B6A6N9QBQ;
 				ENABLE_PREVIEWS = YES;

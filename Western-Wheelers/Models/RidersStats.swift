@@ -21,7 +21,7 @@ class RidersStats : ObservableObject {
     @Published var published_sorted: Int? = nil
     @Published var stats_for_me: [RiderStats]?
 
-    func load_stats() {
+    func loadStats() {
         // called by loader when its done
         self.stats_loaded_notified = stats_loader.data_was_loaded.sink(receiveValue: { value in
             //self.pick_rider(search_name: Util.current_user().site_name_last)
@@ -31,7 +31,7 @@ class RidersStats : ObservableObject {
                 self.published_sorted = self.stats_by_rider.count
             }
         })
-        StatsLoader.instance.load_stats()
+        StatsLoader.instance.loadStats()
     }
     
     func sort(by_column:Int) {

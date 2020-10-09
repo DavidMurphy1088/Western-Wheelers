@@ -216,6 +216,7 @@ class RidesLoader : NSObject {
                 //self.notifyObservers(userMsg: "Cannot load site RSS data")
             }
         }
+        
         task.resume()
     }
 }

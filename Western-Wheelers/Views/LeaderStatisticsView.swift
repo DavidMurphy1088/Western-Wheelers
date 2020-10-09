@@ -13,7 +13,6 @@ struct LeaderStatisticsView: View {
     
     //pretty sure this does not show the navigation bar title becuase no views can be navigated from it
     var body: some View {
-        
         VStack {
             if stats_model.published_total_stats == 0 {
                 VStack {
