@@ -6,12 +6,15 @@ import os.log
 class Rides : ObservableObject {
     private static var inst: Rides? = nil
     
-    @Published var rides:[Ride] = []//()
+    //published data for views
+    @Published var rides:[Ride] = []
     @Published var publishedTotalRides: Int? = nil
     @Published var lastLoadDate:Date?
-    @Published var loadCounts = 0
-
-    public let rideLoadedCount = PassthroughSubject<Int?, Never>()
+    @Published var rideListLoadsCount = 0
+    
+    //subject for subscribers
+    public let ridesListSubject = PassthroughSubject<[Ride]?, Never>()
+    //public let weatherLoadedSubject = PassthroughSubject<Bool, Never>()
 
     let ridesLoader = RidesLoader()
     let weatherLoader = WeatherAPI()
@@ -21,13 +24,10 @@ class Rides : ObservableObject {
     var notifiedWeatherLoaded:AnyCancellable? = nil
     var imageLoadedCancel = [AnyCancellable]()
 
-    var rideCount: Int? = nil;
     var weatherImages = [String: ImageLoader]()
     var weatherDayData = [Date: WeatherAPI.DayWeather]()
-    var weatherApplied = false
-
-    // other (than View) classes can subsribe to this to be notified of data changes. Views can use the published data state
-    //public let data_was_loaded = PassthroughSubject<Rides, Never>()
+    var weatherLoaded = false
+    var ridesLoaded = false
 
     static func instance() -> Rides {
         if Rides.inst == nil {
@@ -36,117 +36,47 @@ class Rides : ObservableObject {
         return Rides.inst!
     }
     
-    func setRideList(ridesLoaded: [Ride]) {
-        DispatchQueue.main.async {
-            Rides.inst?.rides = ridesLoaded
-            Rides.inst?.publishedTotalRides = ridesLoaded.count
-            Rides.inst?.lastLoadDate = Date()
-            Rides.inst?.loadCounts += 1
-            self.rideLoadedCount.send(ridesLoaded.count)
-        }
-    }
-    
-    // apply weather date for the ride's day if we have weather details
-    func applyWeather() {
-        var weather_dates = Array(weatherDayData.keys)
-        weather_dates.sort()
-        var applied = 0
-        for ride in rides {
-            for weather_date in weather_dates {
-                //Rides.show_date(d: weather_date, msg: "apply weather")
-                // the weather date is the date/time they are forecasting the weather for - at this time its noon daily. (i.e. not the time they made the forecast)
-                let diff = weather_date.timeIntervalSinceReferenceDate - ride.dateTime.timeIntervalSinceReferenceDate
-                let hours_diff = Double(diff/(60 * 60)) // hours diff ride start vs time forecasted
-                //is forecast between ride start and end?
-                if hours_diff >= 0 && hours_diff < Ride.LONGEST_RIDE_IN_HOURS {
-                    ride.weather_date = weather_date
-                    let day_weather = weatherDayData[weather_date]
-                    ride.weather_day = day_weather!.temp.day
-                    ride.weather_day_celsius = ((ride.weather_day ?? 0) - 32.0) * (5.0 / 9.0)
-                    ride.weather_max = day_weather!.temp.max
-                    ride.weather_min = day_weather!.temp.min
-                    ride.weather_min_celsius = ((ride.weather_min ?? 0) - 32.0) * (5.0 / 9.0)
-                    ride.weather_pressure = day_weather!.pressure
-                    ride.weather_description = day_weather!.weather[0].description
-                    ride.weather_main = day_weather!.weather[0].main
-                    if ride.weather_main != nil {
-                        ride.weatherDisp = "  \(ride.weather_main!) \(String(format: "%.0f", ride.weather_day!))°  "
-                        applied += 1
-                    }
-                    break
-                }
-            }
-            if ride.weatherDisp == nil {
-                if ride.isEveningRide() {
-                    ride.weatherDisp = " Evening "
-                }
-            }
-            
-        }
-    }
-    
-    //load weather dates and icon image from JSON for each day and dictionary of icon->image
-    func loadWeather() {
-        // build weather image loaders into a dictionary by icon name, clear, cloudy.. etc
-        let formatter = DateFormatter()
-        formatter.timeZone = TimeZone(secondsFromGMT: 0) // RSS dates are in UTC
-        formatter.dateFormat = "yyyy MM dd HH:mm:ss"
-        if let data = weatherLoader.weatherData {
-            for day in data.daily {
-                let day_date_utc = Date(timeIntervalSince1970: TimeInterval(day.dt))
-                weatherDayData[day_date_utc] = day
-                //let icon = day.weather[0].icon
-            }
-        }
-    }
-    
-    func startRideLoader() {
+    func startLoader() {
         let serialQueue = DispatchQueue(label: "ride.loader")
-
         serialQueue.async {
-            let waitTimeSeconds = 30 * 60 //1/2 hour
-            //let waitTimeSeconds = 5 //1/2 hour
+            let waitTimeMinutes = 30
+            let waitTimeSeconds = waitTimeMinutes * 60
             while true {
-                self.loadRides()
+                Rides.inst!.loadRides()
                 sleep(UInt32(waitTimeSeconds)) //dont remove sleep
             }
         }
     }
     
-    func loadRides() {
-        //cannot tell whether rides or weather will load first
-        self.notifiedRidesLoaded = self.rideLoadedCount.sink(receiveValue: { value in
-            self.rideCount = value
-            if !self.weatherApplied {
-                self.applyWeather()
-            }
-
-            DispatchQueue.main.async { // publishing cannot come from background thread
-                self.publishedTotalRides = self.rideCount
-                //self.data_was_loaded.send(self)
-            }
-        })
-
-        self.notifiedWeatherLoaded = weatherLoader.weatherDaysLoaded.sink(receiveValue: { value in
-            self.loadWeather()
-            if self.rideCount != nil {
-                self.applyWeather()
-                self.weatherApplied = true
-            }
-        })
-
-        weatherLoader.load()
-        WAApi.instance().loadRides() 
-    }
-    
-    func getRidesByLevel(level: String?) -> [Ride] {
-        var ride_list = [Ride]()
-        for ride in rides {
-            if level == nil || ride.getLevels().contains(String(level!)) {
-                ride_list.append(ride)
-            }
+    func setRideList(rideList: [Ride]) {
+        if self.weatherLoaded {
+            self.applyWeather(rideList: rideList)
         }
-        return ride_list
+        ridesLoaded = true
+        DispatchQueue.main.async {
+            Rides.inst?.rides = rideList
+            Rides.inst?.publishedTotalRides = rideList.count
+            Rides.inst?.lastLoadDate = Date()
+            Rides.inst?.rideListLoadsCount += 1
+            self.ridesListSubject.send(rideList)
+        }
+    }
+        
+    func loadRides() {
+        //cannot know whether rides or weather will load first
+        self.notifiedWeatherLoaded = weatherLoader.weatherDaysLoaded.sink(receiveValue: { value in
+            self.buildWeatherData()
+            self.weatherLoaded = true
+            if self.ridesLoaded {
+                self.applyWeather(rideList: self.rides)
+                self.ridesListSubject.send(self.rides)
+            }
+        })
+        
+        weatherLoaded = false
+        ridesLoaded = false
+        WAApi.instance().loadRides()
+        weatherLoader.load()
     }
     
     func getRidesByRideId(rid: String) -> Ride? {
@@ -158,18 +88,52 @@ class Rides : ObservableObject {
         return nil
     }
     
-    func getRidesByDescription(search_desc: String) -> [Ride] {
-        var ride_list = [Ride]()
-        let look_for = search_desc.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
-        for ride in rides {
-            if var title = ride.titleFull {
-                title = title.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
-                if title.contains(look_for) {
-                    ride_list.append(ride)
+    // apply weather date for the ride's day if we have weather details
+    func applyWeather(rideList:[Ride]) {
+        var weather_dates = Array(weatherDayData.keys)
+        weather_dates.sort()
+        var applied = 0
+        for ride in rideList {
+            for weather_date in weather_dates {
+                //Rides.show_date(d: weather_date, msg: "apply weather")
+                // the weather date is the date/time they are forecasting the weather for - at this time its noon daily. (i.e. not the time they made the forecast)
+                let diff = weather_date.timeIntervalSinceReferenceDate - ride.dateTime.timeIntervalSinceReferenceDate
+                let hours_diff = Double(diff/(60 * 60)) // hours diff ride start vs time forecasted
+                //is forecast between ride start and end?
+                if hours_diff >= 0 && hours_diff < Ride.LONGEST_RIDE_IN_HOURS {
+                    let dayWeather = weatherDayData[weather_date]
+                    //let weather_day = day_weather!.temp.day
+                    let weatherMax = dayWeather!.temp.max
+                    let weatherDesc = dayWeather!.weather[0].main
+                    //ride.weatherDisp = "  \(weatherDesc) \(String(format: "%.0f", weather_day))° \(String(format: "%.0f", weather_max))°  "
+                    //max appears to be closer to weather underground day max
+                    ride.weatherDisp = "  \(weatherDesc) \(String(format: "%.0f", weatherMax))° "
+                    applied += 1
+                    break
+                }
+            }
+            if ride.weatherDisp == nil {
+                if ride.isEveningRide() {
+                    ride.weatherDisp = " Evening "
                 }
             }
         }
-        return ride_list
+        //self.weatherLoadedSubject.send(true)
+    }
+    
+    //load weather dates and icon image from JSON for each day and dictionary of icon->image
+    func buildWeatherData() {
+        // build weather image loaders into a dictionary by icon name, clear, cloudy.. etc
+        let formatter = DateFormatter()
+        formatter.timeZone = TimeZone(secondsFromGMT: 0) // RSS dates are in UTC
+        formatter.dateFormat = "yyyy MM dd HH:mm:ss"
+        if let data = weatherLoader.weatherData {
+            for day in data.daily {
+                let day_date_utc = Date(timeIntervalSince1970: TimeInterval(day.dt))
+                weatherDayData[day_date_utc] = day
+                //let icon = day.weather[0].icon
+            }
+        }
     }
 
 }

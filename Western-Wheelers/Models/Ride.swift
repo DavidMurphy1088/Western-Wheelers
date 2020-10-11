@@ -17,27 +17,24 @@ class Ride : Identifiable, Equatable, ObservableObject  {
     @Published var htmlDetailWasLoaded = false // true => ride details were loaded from the WW site
 
     var dateTime: Date = Date()          // ride must have date and this date is always GMT. This date is the ride date AND start time
-
     var url: String?
     var titleFull: String?
-
-    var description_html: String?
-    var weather_date: Date?
-    var weather_main: String?
-    var weather_description: String?
-    var weather_icon: String?
-    
     var weatherDisp: String? = nil
-    var weather_day: Float?
-    var weather_day_celsius: Float?
-    var weather_min: Float?
-    var weather_min_celsius: Float?
-    var weather_max: Float?
-    var weather_wind: Float?
-    var weather_pressure: Int?
         
     enum ActiveStatus {
         case Past, RecentlyClosed, Active, UpComing, Future
+    }
+    
+    init () {
+    }
+
+    init (from:Ride) {
+        self.rideId = from.rideId
+        self.htmlDetailWasLoaded = from.htmlDetailWasLoaded
+        self.dateTime = from.dateTime
+        self.url = from.url
+        self.titleFull = from.titleFull
+        self.weatherDisp = from.weatherDisp
     }
     
     func activeStatus() -> ActiveStatus {
@@ -69,17 +66,6 @@ class Ride : Identifiable, Equatable, ObservableObject  {
         }
     }
 
-    func copyRide(with zone: NSZone? = nil) -> Ride {
-        let copy = Ride()
-        copy.rideId = self.rideId
-        copy.htmlDetailWasLoaded = self.htmlDetailWasLoaded
-        copy.dateTime = self.dateTime
-        copy.weatherDisp = self.weatherDisp
-        copy.url = self.url
-        copy.titleFull = self.titleFull
-        return copy
-    }
-    
     func rideUrl() -> String {
         var id = rideId
         if let index = id.firstIndex(of: "-") {
@@ -311,5 +297,17 @@ class Ride : Identifiable, Equatable, ObservableObject  {
         }
         return levels
     }
+    
+    func matchesSearchDescription(searchDesc: String) -> Bool {
+        let search = searchDesc.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+        if var title = titleFull {
+            title = title.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+            if title.contains(search) {
+                return true
+            }
+        }
+        return false
+    }
+
 }
 

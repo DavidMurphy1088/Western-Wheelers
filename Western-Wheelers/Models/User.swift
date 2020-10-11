@@ -37,8 +37,7 @@ class UserModel : ObservableObject {
         //self.userProfileList = sortedUsers
         DispatchQueue.main.async {
             self.userProfileListSubject.send(sortedUsers)
-        }
-        
+        }        
     }
     
     public func loadAllUsers(warmup:Bool = false) {

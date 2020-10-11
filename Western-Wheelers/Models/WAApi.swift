@@ -96,7 +96,7 @@ class WAApi : ObservableObject {
         }
     }
     
-    func dateFromJSON(dateStr:String, debug:Bool=false) -> Date {
+    func dateFromJSON(dateStr:String) -> Date {
         let index = dateStr.index(dateStr.startIndex, offsetBy: 16)
         let dateHHmm = String(dateStr[..<index])
 
@@ -125,7 +125,6 @@ class WAApi : ObservableObject {
     
     func parseRides(jsonData: Any, raw: Data, apiType: ApiType, usrMsg:String, tellUsers:Bool) {
         var rideList = [Ride]()
-        var debug = false
         
         if let events = try! JSONSerialization.jsonObject(with: raw, options: []) as? [String: Any] {
             //dict with one entry for 'events'
@@ -139,14 +138,12 @@ class WAApi : ObservableObject {
                     var sessions:[Ride] = []
                     for (attr, value) in rideDict {
                         let key = attr as! String
-                        debug = ride.titleFull!.contains("HAMILTON")
-
                         if key == "Name" {
                             let title = value as! String
                             ride.titleFull = title
                         }
                         if key == "StartDate" {
-                            ride.dateTime = self.dateFromJSON(dateStr: value as! String, debug: debug)
+                            ride.dateTime = self.dateFromJSON(dateStr: value as! String)
                         }
                         if key == "Url" {
                             ride.url = value as? String
@@ -187,9 +184,13 @@ class WAApi : ObservableObject {
         
         var filteredRides:[Ride] = []
         for ride in rideList {
-            if ride.activeStatus() != Ride.ActiveStatus.Past {
+            if ride.activeStatus() != Ride.ActiveStatus.Past && ride.activeStatus() != Ride.ActiveStatus.RecentlyClosed {
                 filteredRides.append(ride)
             }
+            // used to test rides refresh over time
+            // if filteredRides.count > Rides.instance().rideListLoadsCount + 1 { 
+            //    break
+            // }
         }
         
         if false {
@@ -211,7 +212,7 @@ class WAApi : ObservableObject {
         let sortedRides = filteredRides.sorted(by: {
             $0.dateTime < $1.dateTime
         })
-        Rides.instance().setRideList(ridesLoaded: sortedRides)
+        Rides.instance().setRideList(rideList: sortedRides)
     }
 
     func parseUser(jsonData: Any, raw: Data, apiType: ApiType, usrMsg:String, tellUsers:Bool) {

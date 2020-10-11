@@ -26,7 +26,7 @@ struct RideLevelsView: View {
             formatter.setLocalizedDateFormatFromTemplate(fmt)
             formatter.locale = Locale(identifier: "en_US")
             let loadTime = formatter.string(from: lastDate)
-            self.info += "\nRides loaded at "+String(loadTime)+" (#\(ridesLoader.loadCounts))"
+            self.info += "\nRides loaded at "+String(loadTime)+" (#\(ridesLoader.rideListLoadsCount))"
         }
         if RidersStats.instance.published_total_stats != nil {
             self.info += "\nRiders stats "+String(RidersStats.instance.published_total_stats!)
@@ -45,14 +45,14 @@ struct RideLevelsView: View {
                 }
                 ).textFieldStyle(RoundedBorderTextFieldStyle()).frame(width: 300) //, height: 50)
                 //this nav link needs to be in the view for the onCommit
-                NavigationLink(destination: RideSetView(ride_level: nil, search_term: self.searchValue), isActive: $searchActive) {
+                NavigationLink(destination: RideSetView(rideLevel: nil, searchTerm: self.searchValue), isActive: $searchActive) {
                     Text("Search Rides")
                 }
                 .hidden()
                 .frame(width: 0, height: 0)
 
                 List(rideLevels) {level in
-                    NavigationLink(destination: RideSetView(ride_level: RideLevel(label: level.name), search_term: nil)) {
+                    NavigationLink(destination: RideSetView(rideLevel: RideLevel(label: level.name), searchTerm: nil)) {
                        Text("\(level.name) Rides")
                     }
                 }.padding()
@@ -81,7 +81,7 @@ struct RideLevelsView: View {
         .onAppear() {
             self.getInfo()
         }
-        .onReceive(ridesLoader.$loadCounts) {cnt in
+        .onReceive(ridesLoader.$rideListLoadsCount) {cnt in
             self.getInfo()
         }
         

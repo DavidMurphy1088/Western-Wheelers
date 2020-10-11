@@ -8,8 +8,8 @@ struct ContentView: View {
     @State var searchActive = false
     
     init () {
-        //ridesModel.loadRides()
-        ridesModel.startRideLoader()
+        //required to stop the starting spinner
+        ridesModel.startLoader()
     }
 
     var contents: some View {
@@ -88,7 +88,6 @@ struct ContentView: View {
             }
         }
     }
-
 }
 
 

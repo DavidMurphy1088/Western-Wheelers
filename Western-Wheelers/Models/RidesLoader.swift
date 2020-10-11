@@ -152,9 +152,9 @@ extension RidesLoader: XMLParserDelegate {
             }
         }
         if elementName == "description" {
-            if let r = current_ride {
-                r.description_html = current_value
-            }
+//            if let r = current_ride {
+//                //r.description_html = current_value
+//            }
         }
         current_value = ""
     }

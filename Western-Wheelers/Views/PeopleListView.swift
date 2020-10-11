@@ -30,20 +30,19 @@ class ProfileListModel : ObservableObject {
         
         //listen for profile changes
         self.profileListSubscriber = UserModel.userModel.userProfileListSubject.sink(receiveValue: { profilesSink in
-            print("===profiles received", self.loadNum, "cnt:", profilesSink?.count)
             self.profiles = profilesSink
             self.filterUserList()
         })
         
         refreshQueue.async {
-            let waitTimeSeconds = 5 //1/2 hour //TODO
+            let refreshMinutes = 5
+            let refreshSeconds = refreshMinutes * 60
             while true {
-                print("----Start refresh profiles", self.loadNum)
                 if self.refreshEnabled {
                     UserModel.userModel.loadAllUsers()
                     self.loadNum += 1
                 }
-                sleep(UInt32(waitTimeSeconds)) //dont remove sleep
+                sleep(UInt32(refreshSeconds)) //dont remove sleep
             }
         }
     }
@@ -263,7 +262,6 @@ struct PeopleListView: View {
         }
             
         .onAppear() {
-            print("APPEARED======")
             // appears when view appears first time or when navigating from another tab. Therefore may be called > 1.
             // It is *NOT* called when a view navigated to from here returns.
             if let fileURL = Bundle.main.url(forResource: "doc_person_info", withExtension: "txt") {
@@ -272,7 +270,6 @@ struct PeopleListView: View {
                 }
             }
             self.searchTerm = ""
-            //userHasProfile = false
             if let user = UserModel.userModel.currentUser {
                 //do they have a profile?
                 UserModel.userModel.searchUserByEmail(email: user.email!)
@@ -286,7 +283,6 @@ struct PeopleListView: View {
         }
         
         .onDisappear {
-            print("DISAPPEARED======")
             self.profileListModel.enableRefresh(way: false)
         }
         

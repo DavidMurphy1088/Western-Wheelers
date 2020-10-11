@@ -1,36 +1,65 @@
 import SwiftUI
 import Foundation
+import Combine
+
+class RideSetModel : ObservableObject {
+    static var model = RideSetModel()
+    //update the view as rides change state - e.g. become underway or end
+    @Published private(set) var rideSetList:[Ride]?
+    private var loadedRides:[Ride]? = nil
+    private var rideListSubscriber:AnyCancellable? = nil
+    private var filterLevel:RideLevel?
+    private var filterSearchTerm:String?
+    
+    init() {
+        self.rideListSubscriber = Rides.instance().ridesListSubject.sink(receiveValue: { rides in
+            self.loadedRides = rides
+            self.filterRides()
+        })
+    }
+    
+    func setFilter(level:RideLevel?, searchTerm:String?) {
+        self.filterLevel = level
+        self.filterSearchTerm = searchTerm
+        self.loadedRides = Rides.instance().rides
+        self.filterRides()
+    }
+    
+    func filterRides () {
+        var rides:[Ride] = []
+        if loadedRides != nil {
+            for ride in loadedRides! {
+                if let search = filterSearchTerm {
+                    if ride.matchesSearchDescription(searchDesc: search) {
+                        rides.append(ride)
+                    }
+                }
+                else {
+                    if filterLevel == nil || filterLevel!.name == "All" || ride.getLevels().contains(filterLevel!.name) {
+                        rides.append(Ride(from: ride))
+                    }
+                }
+            }
+            DispatchQueue.main.async {
+                self.rideSetList = rides
+            }
+        }
+    }
+}
 
 struct RideSetView: View {
-    @State var rides: [Ride]?
+    @ObservedObject var ridesModel = RideSetModel.model
     @State var title: String?
 
     var level: RideLevel? = nil
     var search:String? = nil
     
-    init (ride_level: RideLevel?, search_term: String?) {
-        level = ride_level
-        search = search_term
-    }
-
-    func getRides () {
-        if let ride_level = level {
-            rides = Rides.instance().getRidesByLevel(level: ride_level.name == "All" ? nil : ride_level.name)
-            title = ride_level.name
-        }
-        else {
-            if let search_term = search {
-                rides = Rides.instance().getRidesByDescription(search_desc: search_term)
-                title = search ?? ""
-            }
-            else {
-                rides = Rides.instance().getRidesByLevel(level: nil)
-                title = ""
-            }
-        }
+    init (rideLevel: RideLevel?, searchTerm: String?) {
+        level = rideLevel
+        search = searchTerm
     }
     
-    func rideColor(ride:Ride) -> Color {
+    func rideFontColor(ride:Ride) -> Color {
         let status = ride.activeStatus()
         if status == Ride.ActiveStatus.RecentlyClosed {
             return Color .gray
@@ -45,7 +74,7 @@ struct RideSetView: View {
         }
     }
     
-    func rideWeight(ride:Ride) -> Font.Weight {
+    func rideFontWeight(ride:Ride) -> Font.Weight {
         let status = ride.activeStatus()
         if status == Ride.ActiveStatus.Active{
             return Font.Weight.semibold
@@ -60,19 +89,6 @@ struct RideSetView: View {
         }
     }
 
-    func rideList() -> [Ride]? {
-        guard let ridesLoaded = self.rides else {
-            return nil
-        }
-        var ridesToShow:[Ride] = []
-        for ride in ridesLoaded {
-            if ride.activeStatus() != Ride.ActiveStatus.Past && ride.activeStatus() != Ride.ActiveStatus.RecentlyClosed {
-                ridesToShow.append(ride)
-            }
-        }
-        return ridesToShow
-    }
-    
     struct RideDetails: View {
         @State var ride:Ride
         var body: some View {
@@ -96,21 +112,21 @@ struct RideSetView: View {
     
     var body: some View {
         VStack {
-            if self.rides != nil {
-                List(self.rideList()!) {
+            if self.ridesModel.rideSetList != nil {
+                List(self.ridesModel.rideSetList!) {
                     ride in 
                     VStack {
                         NavigationLink(destination: RideWebView(model: WebViewModel(link: ride.rideUrl()))) {
                             VStack(alignment: HorizontalAlignment.leading) {
                                 Text("\(ride.titleFull ?? "no title")")
-                                    .font(.system(size: 18, weight: self.rideWeight(ride: ride), design: .default))
+                                    .font(.system(size: 18, weight: self.rideFontWeight(ride: ride), design: .default))
                                 RideDetails(ride: ride)
                                 if ride.activeStatus() == Ride.ActiveStatus.Active {
                                     Text("Ride is underway")
                                 }
                             }
                             .font(.system(size: 14.0))
-                            .foregroundColor(self.rideColor(ride: ride))
+                            .foregroundColor(self.rideFontColor(ride: ride))
                         }
                     }
                 }
@@ -120,7 +136,13 @@ struct RideSetView: View {
             }
         }
         .onAppear() {
-            self.getRides()
+            self.ridesModel.setFilter(level: self.level, searchTerm: self.search)
+            if level == nil {
+                self.title = ""
+            }
+            else {
+                self.title = level!.name
+            }
         }
         .padding()
     }
