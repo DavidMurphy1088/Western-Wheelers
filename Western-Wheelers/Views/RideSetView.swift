@@ -50,6 +50,7 @@ class RideSetModel : ObservableObject {
 struct RideSetView: View {
     @ObservedObject var ridesModel = RideSetModel.model
     @State var title: String?
+    @Environment(\.colorScheme) var colorScheme
 
     var level: RideLevel? = nil
     var search:String? = nil
@@ -59,7 +60,14 @@ struct RideSetView: View {
         search = searchTerm
     }
     
+    func isDark() -> Bool {
+        return colorScheme == .dark
+    }
+    
     func rideFontColor(ride:Ride) -> Color {
+        if isDark() {
+            return Color.white
+        }
         let status = ride.activeStatus()
         if status == Ride.ActiveStatus.RecentlyClosed {
             return Color .gray
@@ -91,19 +99,23 @@ struct RideSetView: View {
 
     struct RideDetails: View {
         @State var ride:Ride
+        @Environment(\.colorScheme) var colorScheme
+
         var body: some View {
             HStack () {
                 Text("\(ride.dateDisp())")
                 Spacer()
-                if ride.weatherDisp == nil {
-                    if ride.activeStatus() == Ride.ActiveStatus.UpComing && ride.isEveningRide() {
-                        Text(" Evening ").background(Color(red: 0.96, green:0.96, blue:0.96))
+                if colorScheme != .dark {
+                    if ride.weatherDisp == nil {
+                        if ride.activeStatus() == Ride.ActiveStatus.UpComing && ride.isEveningRide() {
+                            Text(" Evening ").background(Color(red: 0.96, green:0.96, blue:0.96))
+                        }
                     }
-                }
-                else {
-                    ride.weatherDisp.map({
-                        Text($0).italic().background(Color(red: 1.0, green:1.0, blue:0.8))
-                    })
+                    else {
+                        ride.weatherDisp.map({
+                            Text($0).italic().background(Color(red: 1.0, green:1.0, blue:0.8))
+                        })
+                    }
                 }
             }
 

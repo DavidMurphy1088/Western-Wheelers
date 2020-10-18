@@ -73,18 +73,11 @@ class WAApi : ObservableObject {
                     let id = perm["AccountId"] as! NSNumber
                     var url = ""
                     if apiType == ApiType.LoadRides {
-                        //let url = "https://api.wildapricot.org/publicview/v1/accounts/\(id)/contacts/me"
-                        //let url = "https://api.wildapricot.org/v2.2/accounts/\(id)/events" //?%24async=true"
-                        //let url = "https://api.wildapricot.org/v2.2/accounts/41275/events?%24async=true"
-                        //let url = "https://api.wildapricot.org/publicview/v1/accounts/41275/eventregistrations"
-                        //let url = "https://api.wildapricot.org/publicview/v1/accounts/41275/contactfields"
-                        //url = "https://api.wildapricot.org/v2.2/accounts/\(id)/events"
-                        // FROM their support https://api.wildapricot.org/v2.1/accounts/{ACCOUNT_ID}/contacts?$async=false&$filter='Membership level ID' eq {LEVEL_ID}
-                        // from Swagger https://api.wildapricot.org/publicview/v1/accounts/41275/events?%24filter=%24filter%3DIsUpcoming%20eq%20false
+//                        these work : curl -H "Authorization: Bearer xjeNN8hx0dh1B6dRzCr2XUmJNmQ-" -X GET //"https://api.wildapricot.org/publicview/v1/accounts/41275/events?%24filter=IsUpcoming%20eq%20true"
+//                        curl -H "Authorization: Bearer xjeNN8hx0dh1B6dRzCr2XUmJNmQ-" -X GET "https://api.wildapricot.org/publicview/v1/accounts/41275/events?%24filter=StartDate%20gt%202020-01-01"
 
-                        //url = "https://api.wildapricot.org/publicview/v1/accounts/41275/events?%24filter=%24filter%3DIsUpcoming%20eq%20false"
-                        url = "https://api.wildapricot.org/publicview/v1/accounts/\(id)/events" //?%24filter=%24filter%3DIsUpcoming%20eq%20false"
-                        //url = "https://api.wildapricot.org/publicview/v1/accounts/\(id)/events?$filter=$filter%3DStartDate%20gt%202016-011-02"
+                        url = "https://api.wildapricot.org/publicview/v1/accounts/\(id)/events"
+                        //url = url + "?%24filter=StartDate%20gt%202020-01-01" TODO
                         apiCall(path: url, withToken: true, usrMsg: usrMsg, completion: parseRides, apiType: apiType, tellUsers: tellUsers)
                     }
                     if apiType == ApiType.AuthenticateUser {
@@ -187,31 +180,30 @@ class WAApi : ObservableObject {
             if ride.activeStatus() != Ride.ActiveStatus.Past && ride.activeStatus() != Ride.ActiveStatus.RecentlyClosed {
                 filteredRides.append(ride)
             }
-            // used to test rides refresh over time
-            // if filteredRides.count > Rides.instance().rideListLoadsCount + 1 { 
-            //    break
-            // }
         }
-        
-        if false {
-            //let testRide = Ride()
-//            let startDate = Calendar.current.date(byAdding: .hour, value: -2, to: Date())!
+
+//        if false {
+//            //let testRide = Ride()
+////            let startDate = Calendar.current.date(byAdding: .hour, value: -2, to: Date())!
+////            testRide.dateTime = startDate
+////            testRide.titleFull="BCD/1/26 TEST ACTIVE RIDE ONLY"
+////            testRide.rideId = "10000"
+////            filteredRides.append(testRide)
+//            
+//            let testRide = Ride()
+//            let startDate = Calendar.current.date(byAdding: .hour, value: 2, to: Date())!
 //            testRide.dateTime = startDate
-//            testRide.titleFull="BCD/1/26 TEST ACTIVE RIDE ONLY"
-//            testRide.rideId = "10000"
+//            testRide.titleFull="CD/1/36 TEST UPCOMING RIDE ONLY"
+//            testRide.rideId = "10001"
 //            filteredRides.append(testRide)
-            
-            let testRide = Ride()
-            let startDate = Calendar.current.date(byAdding: .hour, value: 2, to: Date())!
-            testRide.dateTime = startDate
-            testRide.titleFull="CD/1/36 TEST UPCOMING RIDE ONLY"
-            testRide.rideId = "10001"
-            filteredRides.append(testRide)
-        }
+//        }
 
         let sortedRides = filteredRides.sorted(by: {
             $0.dateTime < $1.dateTime
         })
+//        for ride in sortedRides {
+//            print ("Date", ride.dateTime, ride.titleFull)
+//        }
         Rides.instance().setRideList(rideList: sortedRides)
     }
 
@@ -250,7 +242,9 @@ class WAApi : ObservableObject {
         var request = URLRequest(url: url!)
 
         if withToken {
-            request.setValue("Bearer \(token ?? "")", forHTTPHeaderField: "Authorization")
+            let tokenAuth = "Bearer \(token ?? "")"
+            print ("Token auth", tokenAuth)
+            request.setValue(tokenAuth, forHTTPHeaderField: "Authorization")
         }
         else {
             let auth = "Basic aXNleTBqYWZwOTplYzMxdDN1Zjl1dWFha2h6cXB3NXFsYWF1ZTFnaTY="

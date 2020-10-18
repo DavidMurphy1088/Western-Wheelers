@@ -16,6 +16,29 @@ extension View {
 }
 #endif
 
+class KeyboardHeightHelper: ObservableObject {
+    @Published var keyboardHeight: CGFloat = 0
+    init() {
+        self.listenForKeyboardNotifications()
+    }
+    private func listenForKeyboardNotifications() {
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardDidShowNotification,
+                                               object: nil,
+                                               queue: .main) { (notification) in
+                                                guard let userInfo = notification.userInfo,
+                                                    let keyboardRect = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+                                                
+                                                self.keyboardHeight = keyboardRect.height
+        }
+        
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardDidHideNotification,
+                                               object: nil,
+                                               queue: .main) { (notification) in
+                                                self.keyboardHeight = 0
+        }
+    }
+}
+
 extension Publishers {
     static var keyboardHeight: AnyPublisher<CGFloat, Never> {
         let willShow = NotificationCenter.default.publisher(for: UIApplication.keyboardWillShowNotification)
@@ -116,8 +139,9 @@ struct ProfileEditView: View {
     @ObservedObject var app = Util.app()
     @ObservedObject var fbmanager = UserLoginManager()
     @ObservedObject var imageLoader = ImageLoader()
+    @ObservedObject var keyboardHeightHelper = KeyboardHeightHelper()
     
-    @State var keyboardHeight: CGFloat = 0
+    //@State var keyboardHeight: CGFloat = 0
     @State var infoInFocus = false
     @State var queryRunning = false //View will refresh iff var is @State AND it's used the body AND its state changes in an .onNotify
 
@@ -224,12 +248,19 @@ struct ProfileEditView: View {
     }
 
     func editHeight(screenHeight: CGFloat, hasFocus: Bool, kbHeight:CGFloat) -> CGFloat {
+        var res:CGFloat = 0.0
         if hasFocus {
-            return screenHeight * 0.9 - kbHeight
+            res = screenHeight * 0.5 //minus kbHeight - the screen height passed from the geometry reader already appears to be adjusted for kb height
         }
         else {
-            return screenHeight * 0.3
+            res = screenHeight * 0.3
         }
+        return res
+    }
+    
+    func getImage() -> UIImage? {
+        let image = UserModel.userModel.currentUser!.picture
+        return image
     }
     
     var editor: some View {
@@ -238,10 +269,10 @@ struct ProfileEditView: View {
                 //Text("\(profileUser.nameFirst!) \(profileUser.nameLast!)")
 
                 if !self.infoInFocus {
-                    if self.keyboardHeight == 0 && !self.isLandscape {
+                    if keyboardHeightHelper.keyboardHeight == 0 && !self.isLandscape {
                         self.pictureButtons
                         if !self.isLandscape {
-                            if let pic = UserModel.userModel.currentUser!.picture {
+                            if let pic = self.getImage() {
                                 Image(uiImage:pic) //.fixOrientation()!)
                                     .resizable()
                                     .scaledToFit()
@@ -260,16 +291,14 @@ struct ProfileEditView: View {
                 }
                     
 
-                if self.keyboardHeight != 0 {
+                if keyboardHeightHelper.keyboardHeight != 0 {
                     Text("")
                     Spacer()
                 }
                 VStack {
                     //'[general] Connection to daemon was invalidated' occurs even in the simplest example using TextField when view is a .sheet
-                    //MultilineTextField("", text: $UserModel.userModel.currentUser.info fucked up mess
                     MultilineTextField("", textIn: UserModel.userModel.currentUser!.info ?? ""
                                ,onFocus: {
-                                   //self.infoHeight = self.infoHeightRead * 2
                                    self.infoInFocus = true
                                }
                                ,onDone: {
@@ -282,18 +311,19 @@ struct ProfileEditView: View {
                 }
 
                 //.overlay(RoundedRectangle(cornerRadius: 5).stroke(Color.red))
-                .frame(width: 0.9 *  geometry.size.width, height: self.editHeight(screenHeight: geometry.size.height, hasFocus: self.infoInFocus, kbHeight: self.keyboardHeight))
+                .frame(width: 0.9 *  geometry.size.width,
+                       height: self.editHeight(screenHeight: geometry.size.height, hasFocus: self.infoInFocus, kbHeight: keyboardHeightHelper.keyboardHeight))
                 //.border(Color.blue)
 
-                if self.keyboardHeight != 0 {
+                if keyboardHeightHelper.keyboardHeight != 0 {
                     //keyboard is editing profile and user can end edit with DONE on keyboard
-                    if self.keyboardHeight != 0 {
+                    if keyboardHeightHelper.keyboardHeight != 0 {
                         Button("Hide Keyboard") {
                             self.infoInFocus = false
                             self.hideKeyboard()
                         }
                     }
-                    Spacer().frame(height: 1.0 * self.keyboardHeight)
+                    Spacer().frame(height: 1.0 * keyboardHeightHelper.keyboardHeight)
                 }
                 else {
                     self.actionButtons
@@ -388,10 +418,6 @@ struct ProfileEditView: View {
             if let im = self.imageLoader.image {
                 UserModel.userModel.currentUser!.picture = im
             }
-        }
-            
-        .onReceive(Publishers.keyboardHeight) {
-            self.keyboardHeight = $0
         }
     }
 }
