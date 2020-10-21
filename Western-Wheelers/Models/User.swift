@@ -316,7 +316,7 @@ class User : ObservableObject, Identifiable {
                     self.remoteAdd(completion: {recordId in
                         self.recordId = recordId
                         for _ in 1...3 {
-                            sleep(1) //dont remove, despite loadUsers coming after the completion of add the new record is not loaded (unless there is a s.leep). No idea why...
+                            sleep(1) //dont remove, despite loadUsers coming after the completion of add the new record is not loaded (unless there is a sleep). No idea why...
                             UserModel.userModel.loadAllUsers()
                         }
                     })

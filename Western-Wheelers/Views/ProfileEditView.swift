@@ -216,23 +216,26 @@ struct ProfileEditView: View {
         }
     }
     
+    var saveButton: some View {
+        return Button(action: {
+            if (UserModel.userModel.currentUser!.info == nil || UserModel.userModel.currentUser!.info!.trimmingCharacters(in: .whitespacesAndNewlines) == "") &&
+                (UserModel.userModel.currentUser!.picture == nil) {
+                self.showAlert = true
+                self.alertType = .emptyProfile
+            }
+            else {
+                UserModel.userModel.currentUser!.saveProfile()
+                self.isPresented = false
+            }
+        }) {
+            Text("Save")
+        }
+
+    }
     var actionButtons: some View  {
         HStack {
             Spacer()
-            Button(action: {
-                if (UserModel.userModel.currentUser!.info == nil || UserModel.userModel.currentUser!.info!.trimmingCharacters(in: .whitespacesAndNewlines) == "") &&
-                    (UserModel.userModel.currentUser!.picture == nil) {
-                    self.showAlert = true
-                    self.alertType = .emptyProfile
-                }
-                else {
-                    UserModel.userModel.currentUser!.saveProfile()
-                    self.isPresented = false
-                }
-            }) {
-                Text("Save")
-            }
-            
+            self.saveButton
             if UserModel.userModel.currentUser!.recordId != nil {
                 Spacer()
                 //user has a Cloudkit record to delete
@@ -318,9 +321,15 @@ struct ProfileEditView: View {
                 if keyboardHeightHelper.keyboardHeight != 0 {
                     //keyboard is editing profile and user can end edit with DONE on keyboard
                     if keyboardHeightHelper.keyboardHeight != 0 {
-                        Button("Hide Keyboard") {
-                            self.infoInFocus = false
-                            self.hideKeyboard()
+                        HStack {
+                            Spacer()
+                            self.saveButton
+                            Spacer()
+                            Button("Hide Keyboard") {
+                                self.infoInFocus = false
+                                self.hideKeyboard()
+                            }
+                            Spacer()
                         }
                     }
                     Spacer().frame(height: 1.0 * keyboardHeightHelper.keyboardHeight)

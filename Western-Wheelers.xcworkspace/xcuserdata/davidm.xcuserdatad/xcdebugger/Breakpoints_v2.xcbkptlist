@@ -126,8 +126,8 @@
             filePath = "Western-Wheelers/Models/WAApi.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "178"
-            endingLineNumber = "178"
+            startingLineNumber = "176"
+            endingLineNumber = "176"
             landmarkName = "parseRides(jsonData:raw:apiType:usrMsg:tellUsers:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -142,8 +142,8 @@
             filePath = "Western-Wheelers/Models/WAApi.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "184"
-            endingLineNumber = "184"
+            startingLineNumber = "182"
+            endingLineNumber = "182"
             landmarkName = "parseRides(jsonData:raw:apiType:usrMsg:tellUsers:)"
             landmarkType = "7">
          </BreakpointContent>

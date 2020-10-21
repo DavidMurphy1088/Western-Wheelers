@@ -73,11 +73,9 @@ class WAApi : ObservableObject {
                     let id = perm["AccountId"] as! NSNumber
                     var url = ""
                     if apiType == ApiType.LoadRides {
-//                        these work : curl -H "Authorization: Bearer xjeNN8hx0dh1B6dRzCr2XUmJNmQ-" -X GET //"https://api.wildapricot.org/publicview/v1/accounts/41275/events?%24filter=IsUpcoming%20eq%20true"
-//                        curl -H "Authorization: Bearer xjeNN8hx0dh1B6dRzCr2XUmJNmQ-" -X GET "https://api.wildapricot.org/publicview/v1/accounts/41275/events?%24filter=StartDate%20gt%202020-01-01"
-
                         url = "https://api.wildapricot.org/publicview/v1/accounts/\(id)/events"
-                        //url = url + "?%24filter=StartDate%20gt%202020-01-01" TODO
+                        //A past date returns only future evetns. A future date shows all events after that date
+                        //url = url + "?%24filter=StartDate%20gt%202020-01-01" //TODO.
                         apiCall(path: url, withToken: true, usrMsg: usrMsg, completion: parseRides, apiType: apiType, tellUsers: tellUsers)
                     }
                     if apiType == ApiType.AuthenticateUser {
@@ -202,7 +200,7 @@ class WAApi : ObservableObject {
             $0.dateTime < $1.dateTime
         })
 //        for ride in sortedRides {
-//            print ("Date", ride.dateTime, ride.titleFull)
+//            prxint ("Date", ride.dateTime, ride.rideUrl())
 //        }
         Rides.instance().setRideList(rideList: sortedRides)
     }
@@ -243,7 +241,6 @@ class WAApi : ObservableObject {
 
         if withToken {
             let tokenAuth = "Bearer \(token ?? "")"
-            print ("Token auth", tokenAuth)
             request.setValue(tokenAuth, forHTTPHeaderField: "Authorization")
         }
         else {
