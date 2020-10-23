@@ -28,7 +28,11 @@ class Rides : ObservableObject {
     var weatherDayData = [Date: WeatherAPI.DayWeather]()
     var weatherLoaded = false
     var ridesLoaded = false
-
+    
+    //map of ride events to ride with GPS link. All ride sessions from the same ride event have the same gps link
+    var rideWithGPSlinkMap = [String: String]()
+    var pagesLoaded = 0
+    
     static func instance() -> Rides {
         if Rides.inst == nil {
             Rides.inst = Rides()
@@ -60,8 +64,86 @@ class Rides : ObservableObject {
             Rides.inst?.rideListLoadsCount += 1
             self.ridesListSubject.send(rideList)
         }
+        pagesLoaded = 0
+        loadRideWithGps(rides: rideList, index: 0)
     }
+    
+    func loadNextPage(ride:Ride) -> Bool {
+        var loadNext = false
+        var days = 0.0
+        let seconds = 0 - Date().timeIntervalSince(ride.dateTime)
+        let hours = seconds / (60.0 * 60.0)
+        days = hours / (24.0)
+        if days < 10 {
+            loadNext = true
+        }
+        return loadNext
+    }
+    
+    func loadRideWithGps(rides:[Ride], index: Int) {
+        let ride = rides[index]
+        if self.rideWithGPSlinkMap[ride.eventId] != nil {
+            ride.rideWithGpsLink = self.rideWithGPSlinkMap[ride.eventId]
+            if index < rides.count - 1 {
+                self.loadRideWithGps(rides: rides, index: index+1)
+            }
+            return
+        }
+        guard let url = URL(string: ride.rideUrl()) else {
+            if index < rides.count - 1 {
+                self.loadRideWithGps(rides: rides, index: index+1)
+            }
+            return
+        }
+        let request = URLRequest(url: url)
         
+        //search ride page for a RideWithGps link
+        if loadNextPage(ride: ride) {
+            //sleep(1)
+            pagesLoaded += 1
+            DispatchQueue.global(qos: .background).async {
+                URLSession.shared.dataTask(with: request) { data, response, error in
+                    self.rideWithGPSlinkMap[ride.eventId] = nil
+                    if error==nil && data != nil {
+                        let linkSearch = "https://ridewithgps.com/routes"
+                        let ridePage = String(decoding: data!, as: UTF8.self)
+                        if ridePage.contains(linkSearch) {
+                            let words = ridePage.components(separatedBy: " ")
+                            for word in words {
+                                if word.contains(linkSearch) {
+                                    if word.hasPrefix("https://") {
+                                        var id = ""
+                                        for c in word {
+                                            if c >= "0" && c <= "9" {
+                                                id = id + String(c)
+                                            }
+                                        }
+                                        let link = "\(linkSearch)/\(id)"
+                                        ride.rideWithGpsLink = link
+                                        DispatchQueue.main.async {
+                                            //self.rides[index] = newRide
+                                            self.ridesListSubject.send(self.rides)
+                                        }
+                                        self.rideWithGPSlinkMap[ride.eventId] = link
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if index < rides.count - 1 {
+                        self.loadRideWithGps(rides: rides, index: index+1)
+                    }
+                }
+                .resume()
+            }
+        }
+        else {
+            if index < rides.count - 1 {
+                self.loadRideWithGps(rides: rides, index: index+1)
+            }
+        }
+    }
+
     func loadRides() {
         //cannot know whether rides or weather will load first
         self.notifiedWeatherLoaded = weatherLoader.weatherDaysLoaded.sink(receiveValue: { value in
@@ -79,14 +161,14 @@ class Rides : ObservableObject {
         weatherLoader.load()
     }
     
-    func getRidesByRideId(rid: String) -> Ride? {
-        for ride in rides {
-            if ride.rideId == rid {
-                return ride
-            }
-        }
-        return nil
-    }
+//    func getRidesByRideId(rid: String) -> Ride? {
+//        for ride in rides {
+//            if ride.rideId == rid {
+//                return ride
+//            }
+//        }
+//        return nil
+//    }
     
     // apply weather date for the ride's day if we have weather details
     func applyWeather(rideList:[Ride]) {

@@ -76,6 +76,7 @@ class WAApi : ObservableObject {
                         url = "https://api.wildapricot.org/publicview/v1/accounts/\(id)/events"
                         //A past date returns only future evetns. A future date shows all events after that date
                         //url = url + "?%24filter=StartDate%20gt%202020-01-01" //TODO.
+                        //print ("URL=", url)
                         apiCall(path: url, withToken: true, usrMsg: usrMsg, completion: parseRides, apiType: apiType, tellUsers: tellUsers)
                     }
                     if apiType == ApiType.AuthenticateUser {
@@ -154,14 +155,15 @@ class WAApi : ObservableObject {
                             }
                         }
                         if key == "Id" {
-                            ride.rideId = "\(value)"
+                            ride.eventId = "\(value)"
                         }
                     }
                     if sessions.count > 0 {
                         var sessionNum = 0
                         for session in sessions {
                             session.titleFull = ride.titleFull
-                            session.rideId = "\(ride.rideId)-\(sessionNum)"
+                            session.eventId = ride.eventId
+                            session.sessionId = sessionNum
                             rideList.append(session)
                             sessionNum += 1
                         }
@@ -200,7 +202,7 @@ class WAApi : ObservableObject {
             $0.dateTime < $1.dateTime
         })
 //        for ride in sortedRides {
-//            prxint ("Date", ride.dateTime, ride.rideUrl())
+//            print ("Date", ride.dateTime, ride.rideUrl())
 //        }
         Rides.instance().setRideList(rideList: sortedRides)
     }
@@ -268,6 +270,13 @@ class WAApi : ObservableObject {
             }
             do {
                 if let jsonData = try JSONSerialization.jsonObject(with: rawData, options: []) as? [String: Any] {
+//                    let str = String(decoding: rawData, as: UTF8.self)
+//                    do {
+//                        let path = URL(fileURLWithPath: "///Users/davidm")
+//                        let filename = path.appendingPathComponent("output.txt")
+//                        try str.write(to: filename, atomically: true, encoding: String.Encoding.utf8)
+//                    } catch {
+//                    }
                     completion(jsonData, rawData, apiType, usrMsg, tellUsers)
                 }
             } catch let error as NSError {

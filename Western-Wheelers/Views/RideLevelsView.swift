@@ -37,6 +37,7 @@ struct RideLevelsView: View {
     var body: some View {
         NavigationView {
             VStack(alignment: .center) {
+                Spacer()
                 TextField("search", text: $searchValue, onEditingChanged: {_ in
                 }, onCommit: {
                     if self.searchValue != "" {

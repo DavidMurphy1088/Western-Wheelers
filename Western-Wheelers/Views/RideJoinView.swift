@@ -33,7 +33,7 @@ class JoinModel: ObservableObject {
         }
     }
     
-    func refresh(rideList:[Ride], joinedId:String?, joinedLvl:String?) -> Int {
+    func refresh(rideList:[Ride], joinedEventId:String?, joinedSessionId:Int, joinedLvl:String?) -> Int {
         joinableRides = []
         var list:[JoinedRide] = []
         var selected = -1
@@ -43,7 +43,7 @@ class JoinModel: ObservableObject {
             if status == Ride.ActiveStatus.Active || status == Ride.ActiveStatus.UpComing {
                 for level in ride.getLevels() {
                     list.append(JoinedRide(rideIn: ride, lvl: level, descr: ride.titleWithLevel(level: level)!))
-                    if ride.rideId == joinedId && level == joinedLvl {
+                    if ride.eventId == joinedEventId && ride.sessionId == joinedSessionId && level == joinedLvl {
                         selected = index
                     }
                     index += 1
@@ -63,19 +63,22 @@ struct RideJoinView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     
     @State var appearCount = 0
-    @State var joinedRide:String?
+    @State var joinedEvent:String?
+    @State var joinedSession:Int
     @State var joinedRideLevel:String?
     @State var selectedIndex:Int = -1
     
     func saveJoin(ride: JoinedRide?) {
         let user = User(user: UserModel.userModel.currentUser!)
         if let ride = ride {
-            user.joinedRideID = ride.ride.rideId
+            user.joinedRideEventId = ride.ride.eventId
+            user.joinedRideSessionId = ride.ride.sessionId
             user.joinedRideLevel = ride.level
             user.joinedRideDate = Date()
         }
         else {
-            user.joinedRideID = nil
+            user.joinedRideEventId = nil
+            user.joinedRideSessionId = 0
             user.joinedRideLevel = nil
             user.joinedRideDate = Date()
         }
@@ -146,7 +149,7 @@ struct RideJoinView: View {
                         }
                     }
                     
-                    if UserModel.userModel.currentUser?.joinedRideID != nil {
+                    if UserModel.userModel.currentUser?.joinedRideEventId != nil {
                         Spacer()
                         Button(action: {
                             //self.selectedIndex = -1
@@ -164,7 +167,8 @@ struct RideJoinView: View {
         .onAppear() {
             if appearCount == 0 {
                 //this is called EVERY time the view appears, specifically - when returning from selecting an item in the picker
-                let index = self.joinModel.refresh(rideList: Rides.instance().rides, joinedId: joinedRide, joinedLvl: joinedRideLevel)
+                //let index = self.joinModel.refresh(rideList: Rides.instance().rides, joinedId: joinedRide, joinedLvl: joinedRideLevel)
+                let index = self.joinModel.refresh(rideList: Rides.instance().rides, joinedEventId: joinedEvent, joinedSessionId: joinedSession, joinedLvl: joinedRideLevel)
                 if selectedIndex < 0 {
                     selectedIndex = index
                 }

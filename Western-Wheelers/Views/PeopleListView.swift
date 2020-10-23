@@ -16,7 +16,8 @@ class ProfileListModel : ObservableObject {
     
     private var profiles:[User]? = nil
     private var searchTerm:String?
-    private var searchRideId:String?
+    private var searchRideEventId:String?
+    private var searchRideSessionId:Int = 0
     private var searchRideLevel:String?
     private var refreshEnabled = false
     private var loadNum = 0
@@ -55,14 +56,16 @@ class ProfileListModel : ObservableObject {
         self.refreshEnabled = way
     }
     
-    func setFilter(searchTerm: String, searchRideId: String?, searchRideLevel:String?) {
+    func setFilter(searchTerm: String, searchEventId: String?, searchSessionId:Int, searchRideLevel:String?) {
         self.searchTerm = searchTerm
-        self.searchRideId = searchRideId
+        self.searchRideEventId = searchEventId
+        self.searchRideSessionId = searchSessionId
         self.searchRideLevel = searchRideLevel
     }
     
     func clearRideFilter() {
-        self.searchRideId = nil
+        self.searchRideEventId = nil
+        self.searchRideSessionId = 0
         self.searchRideLevel = nil
         self.refreshEnabled = false
     }
@@ -73,8 +76,8 @@ class ProfileListModel : ObservableObject {
         }
         var filterList:[User] = []
         for user in profiles {
-            if let searchId = searchRideId {
-                if user.joinedRideID != searchId {
+            if let searchId = searchRideEventId {
+                if user.joinedRideEventId != searchId || user.joinedRideSessionId != searchRideSessionId {
                     continue
                 }
             }
@@ -122,9 +125,9 @@ struct PeopleListView: View {
     @State var showJoinRide = false
     @State var onMyRide = false
     
-    func rideTitle(id: String) -> String {
+    func rideTitle(eventId: String) -> String { 
         for ride in Rides.instance().rides {
-            if ride.rideId == id {
+            if ride.eventId == eventId {
                 return ride.titleWithoutLevels() ?? ""
             }
         }
@@ -138,6 +141,12 @@ struct PeopleListView: View {
         return !((user.info == nil || user.info == "") && user.picture == nil)
     }
     
+    func sessionId(user:User?) -> Int {
+        guard let user = user else {
+            return 0
+        }
+        return user.joinedRideSessionId
+    }
     var body: some View {
         // users not signed with Apple ID can read the Cloudkit List, i.e. no need to be signed in
         let searchBinding = Binding<String>(get: {
@@ -145,8 +154,9 @@ struct PeopleListView: View {
         }, set: {
             self.searchTerm = $0
             profileListModel.setFilter(searchTerm: self.searchTerm,
-                                     searchRideId: self.onMyRide ? UserModel.userModel.currentUser!.joinedRideID : nil,
-                                     searchRideLevel: self.onMyRide ? UserModel.userModel.currentUser!.joinedRideLevel : nil)
+                                       searchEventId: self.onMyRide ? UserModel.userModel.currentUser!.joinedRideEventId : nil,
+                                       searchSessionId: self.onMyRide ? UserModel.userModel.currentUser!.joinedRideSessionId : 0,
+                                       searchRideLevel: self.onMyRide ? UserModel.userModel.currentUser!.joinedRideLevel : nil)
             profileListModel.filterUserList()
         })
 
@@ -157,7 +167,8 @@ struct PeopleListView: View {
             //get a fresh list of users on this ride, maybe people joined or left
             self.profileListModel.enableRefresh(way: self.onMyRide)
             profileListModel.setFilter(searchTerm: self.searchTerm,
-                                     searchRideId: self.onMyRide ? UserModel.userModel.currentUser!.joinedRideID : nil,
+                                     searchEventId: self.onMyRide ? UserModel.userModel.currentUser!.joinedRideEventId : nil,
+                                     searchSessionId: self.onMyRide ? UserModel.userModel.currentUser!.joinedRideSessionId : 0,
                                      searchRideLevel: self.onMyRide ? UserModel.userModel.currentUser!.joinedRideLevel : nil)
             self.profileListModel.loadProfiles()
         })
@@ -172,10 +183,10 @@ struct PeopleListView: View {
                         }.foregroundColor(Color.blue)
                     }
                     else {
-                        if UserModel.userModel.currentUser?.joinedRideID != nil && UserModel.userModel.currentUser?.joinedRideID != "" {
+                        if UserModel.userModel.currentUser?.joinedRideEventId != nil && UserModel.userModel.currentUser?.joinedRideEventId != "" {
                             Text("Your Ride").font(.footnote)
                             VStack {
-                                Text("\(self.rideTitle(id: (UserModel.userModel.currentUser?.joinedRideID)!))")
+                                Text("\(self.rideTitle(eventId: (UserModel.userModel.currentUser?.joinedRideEventId)!))")
                                 Text("\(UserModel.userModel.currentUser?.joinedRideLevel ?? "") Ride")
                             }
                             .font(.footnote)
@@ -194,8 +205,8 @@ struct PeopleListView: View {
                         }
                         Toggle("On My Ride", isOn: onMyRide).disabled(
                             UserModel.userModel.currentUser == nil ||
-                            UserModel.userModel.currentUser?.joinedRideID == nil ||
-                            UserModel.userModel.currentUser!.joinedRideID == "")
+                            UserModel.userModel.currentUser?.joinedRideEventId == nil ||
+                            UserModel.userModel.currentUser!.joinedRideEventId == "")
                         .frame(width: geometry.size.width * 0.5)
                         
                         //sometimes the email search results come after the list results and so the current user show blank in the list - this attempts to fix that
@@ -222,9 +233,13 @@ struct PeopleListView: View {
                             .padding()
                             .disabled(userModel.currentUser == nil)
 
-                            NavigationLink(destination: RideJoinView(onRideFilterOn: $onMyRide, joinedRide: UserModel.userModel.currentUser?.joinedRideID,
-                                                                     joinedRideLevel: UserModel.userModel.currentUser?.joinedRideLevel),
-                                                                     isActive: $showJoinRide) {
+                            NavigationLink(destination: RideJoinView(
+                                            onRideFilterOn: $onMyRide,
+                                            joinedEvent: UserModel.userModel.currentUser?.joinedRideEventId,
+                                            joinedSession: self.sessionId(user: UserModel.userModel.currentUser),
+                                            joinedRideLevel: UserModel.userModel.currentUser?.joinedRideLevel),
+                                            isActive: $showJoinRide) {
+                                
                                 Text("Join/Leave Ride")
                             }
                             .padding()

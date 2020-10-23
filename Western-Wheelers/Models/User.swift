@@ -27,7 +27,9 @@ class UserModel : ObservableObject {
     }
     
     func setCurrentUser(user:User) {
-        currentUser = User(user: user)
+        DispatchQueue.main.async {
+            self.currentUser = User(user: user)
+        }
     }
     
     func notifyAllLoaded(loaded:[User]) {
@@ -56,8 +58,9 @@ class UserModel : ObservableObject {
         var listAll:[User] = []
         let queryOperation = CKQueryOperation(query: CKQuery(recordType: "People", predicate: NSPredicate(value: true)))
         // specify the zoneID from which the records should be retrieved
-        queryOperation.desiredKeys = ["email", "name_last", "name_first", "ride_joined_id", "ride_joined_level", "ride_joined_date"]
-        
+        queryOperation.desiredKeys = ["email", "name_last", "name_first", "ride_joined_id", "ride_joined_session", "ride_joined_level", "ride_joined_date"]
+        queryOperation.queuePriority = .veryHigh
+
         if warmup {
             //pre-fetch on Cloudkit to make subsequent queries faster - maybe?
             queryOperation.recordFetchedBlock = {record in
@@ -150,24 +153,25 @@ class UserModel : ObservableObject {
     func searchUserByEmail(email: String) {
         var queryUser:User? = nil
         let pred = NSPredicate(format: "email == %@", email)
-        self.remoteQuery(pred: pred, fields: ["email", "info", "picture", "name_last", "name_first", "ride_joined_id", "ride_joined_level", "ride_joined_date"],
+        self.remoteQuery(pred: pred, fields: ["email", "info", "picture", "name_last", "name_first", "ride_joined_id", "ride_joined_session", "ride_joined_level", "ride_joined_date"],
         fetch: {record in
             queryUser = User(record: record)
         },
         completion: {
             DispatchQueue.main.async {
                 if let user = queryUser  {
-                    if let rideId = user.joinedRideID {
-                        //user was on ride that finished
+                    if let eventId = user.joinedRideEventId {
+                        //check user was on ride that finished
                         var fnd = false
                         for ride in Rides.instance().rides {
-                            if ride.rideId == rideId {
+                            if ride.eventId == eventId && ride.sessionId == user.joinedRideSessionId {
                                 fnd = true
                                 break
                             }
                         }
                         if !fnd {
-                            user.joinedRideID = nil
+                            user.joinedRideEventId = nil
+                            user.joinedRideSessionId = 0
                             user.joinedRideLevel = nil
                         }
                     }
@@ -179,7 +183,7 @@ class UserModel : ObservableObject {
             }
         })
     }
-        
+    
 }
 
 class User : ObservableObject, Identifiable { 
@@ -196,7 +200,8 @@ class User : ObservableObject, Identifiable {
     var picture: UIImage? = nil
 
     // joined ride
-    var joinedRideID: String? = nil
+    var joinedRideEventId: String? = nil
+    var joinedRideSessionId: Int = 0
     var joinedRideLevel: String? = nil
     var joinedRideDate:Date? = nil
 
@@ -257,7 +262,10 @@ class User : ObservableObject, Identifiable {
             }
         }
         if let data = record["ride_joined_id"] {
-            joinedRideID = data.description
+            joinedRideEventId = data.description
+        }
+        if let data = record["ride_joined_session"] {
+            joinedRideSessionId = Int(data.description) ?? 0
         }
         if let data = record["ride_joined_level"] {
             joinedRideLevel = data.description
@@ -274,7 +282,8 @@ class User : ObservableObject, Identifiable {
         self.nameLast = user.nameLast
         self.info = user.info
         self.picture = user.picture
-        self.joinedRideID = user.joinedRideID
+        self.joinedRideEventId = user.joinedRideEventId
+        self.joinedRideSessionId = user.joinedRideSessionId
         self.joinedRideLevel = user.joinedRideLevel
         self.joinedRideDate = user.joinedRideDate
     }
@@ -412,11 +421,13 @@ class User : ObservableObject, Identifiable {
         if let data = self.info {
             ck_record["info"] = data as CKRecordValue
         }
-        if let data = self.joinedRideID {
+        if let data = self.joinedRideEventId {
             ck_record["ride_joined_id"] = data as CKRecordValue
+            ck_record["ride_joined_session"] = self.joinedRideSessionId
         }
         else {
             ck_record["ride_joined_id"] = ""
+            ck_record["ride_joined_session"] = 0
         }
         if let data = self.joinedRideLevel {
             ck_record["ride_joined_level"] = data as CKRecordValue
@@ -486,9 +497,8 @@ class User : ObservableObject, Identifiable {
     }
     
     func leaveRide(left_ride: Ride) {
-        self.joinedRideID = nil
-        //self.saveLocalRideState(ride: nil)
-        //LocationManager.lm().stop_updating_location()
+        self.joinedRideEventId = nil
+        self.joinedRideSessionId = 0
     
         // tell others not to show me
         self.location_latitude = 0 // not nil which is ignored during save

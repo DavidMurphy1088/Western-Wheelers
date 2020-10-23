@@ -74,7 +74,7 @@ struct RideSetView: View {
         }
         else {
             if status == Ride.ActiveStatus.Active {
-                return Color .blue
+                return Color .black
             }
             else {
                 return Color .black
@@ -82,17 +82,29 @@ struct RideSetView: View {
         }
     }
     
-    func rideFontWeight(ride:Ride) -> Font.Weight {
-        let status = ride.activeStatus()
-        if status == Ride.ActiveStatus.Active{
-            return Font.Weight.semibold
-        }
-        else {
-            if status == Ride.ActiveStatus.UpComing {
+    struct RideHeader: View {
+        @State var ride:Ride
+        @Environment(\.colorScheme) var colorScheme
+        
+        func rideFontWeight(ride:Ride) -> Font.Weight {
+            let status = ride.activeStatus()
+            if status == Ride.ActiveStatus.Active{
                 return Font.Weight.semibold
             }
             else {
-                return Font.Weight.regular
+                if status == Ride.ActiveStatus.UpComing {
+                    return Font.Weight.semibold
+                }
+                else {
+                    return Font.Weight.regular
+                }
+            }
+        }
+
+        var body: some View {
+            HStack {
+                Text("\(ride.titleFull ?? "no title")")
+                .font(.system(size: 18, weight: self.rideFontWeight(ride: ride), design: .default))
             }
         }
     }
@@ -102,23 +114,33 @@ struct RideSetView: View {
         @Environment(\.colorScheme) var colorScheme
 
         var body: some View {
-            HStack () {
-                Text("\(ride.dateDisp())")
-                Spacer()
-                if colorScheme != .dark {
-                    if ride.weatherDisp == nil {
-                        if ride.activeStatus() == Ride.ActiveStatus.UpComing && ride.isEveningRide() {
-                            Text(" Evening ").background(Color(red: 0.96, green:0.96, blue:0.96))
+            VStack (alignment: .leading) {
+                HStack () {
+                    Text("\(ride.dateDisp())")
+                    Spacer()
+                    if colorScheme != .dark {
+                        if ride.weatherDisp == nil {
+                            if ride.activeStatus() == Ride.ActiveStatus.UpComing && ride.isEveningRide() {
+                                Text(" Evening ").background(Color(red: 0.96, green:0.96, blue:0.96))
+                            }
+                        }
+                        else {
+                            ride.weatherDisp.map({
+                                Text($0).italic().background(Color(red: 1.0, green:1.0, blue:0.8))
+                            })
                         }
                     }
-                    else {
-                        ride.weatherDisp.map({
-                            Text($0).italic().background(Color(red: 1.0, green:1.0, blue:0.8))
-                        })
-                    }
+                }
+                if ride.rideWithGpsLink != nil {
+                    //Image("ride_with_gps").resizable().frame(width:15, height: 15)
+                    Text("Ride With GPS")
+                        .onTapGesture() {
+                            UIApplication.shared.open(URL(string: ride.rideWithGpsLink!)!)
+                        }
+                        .foregroundColor(.blue)
                 }
             }
-
+            .font(.system(size: 14.0))
         }
     }
     
@@ -130,14 +152,12 @@ struct RideSetView: View {
                     VStack {
                         NavigationLink(destination: RideWebView(model: WebViewModel(link: ride.rideUrl()))) {
                             VStack(alignment: HorizontalAlignment.leading) {
-                                Text("\(ride.titleFull ?? "no title")")
-                                    .font(.system(size: 18, weight: self.rideFontWeight(ride: ride), design: .default))
+                                RideHeader(ride: ride)
                                 RideDetails(ride: ride)
                                 if ride.activeStatus() == Ride.ActiveStatus.Active {
                                     Text("Ride is underway")
                                 }
                             }
-                            .font(.system(size: 14.0))
                             .foregroundColor(self.rideFontColor(ride: ride))
                         }
                     }

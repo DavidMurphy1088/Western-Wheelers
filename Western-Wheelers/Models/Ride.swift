@@ -9,10 +9,11 @@ class Ride : Identifiable, Equatable, ObservableObject  {
     static let DAYS_HILIGHTED_AS_NEARBY = 24.0 //  number of hours before ride start when a rider can join
     static let LONGEST_RIDE_IN_HOURS = 8.0 //asume max ride length of 8 hrs
     
-    //Can't be optional. Loaded from the WA API. For events 'series' the QA id is the same for each instance of the event.
+    //Can't be optional. Loaded from the WA API. For events 'series' the Wild Apricot id is the same for each instance of the event.
     //So for event uniqueness with event series instances, the rideID is the 'event ID' + the instance number. e.g. event = 12345, instance 15 the id is 12345-15
     //For a ride not in a series the instance number is omitted. e.g. 12345
-    var rideId: String = ""
+    var eventId: String = ""
+    var sessionId: Int = 0
 
     @Published var htmlDetailWasLoaded = false // true => ride details were loaded from the WW site
 
@@ -20,6 +21,7 @@ class Ride : Identifiable, Equatable, ObservableObject  {
     var url: String?
     var titleFull: String?
     var weatherDisp: String? = nil
+    var rideWithGpsLink: String? = nil
         
     enum ActiveStatus {
         case Past, RecentlyClosed, Active, UpComing, Future
@@ -29,12 +31,14 @@ class Ride : Identifiable, Equatable, ObservableObject  {
     }
 
     init (from:Ride) {
-        self.rideId = from.rideId
+        self.eventId = from.eventId
+        self.sessionId = from.sessionId
         self.htmlDetailWasLoaded = from.htmlDetailWasLoaded
         self.dateTime = from.dateTime
         self.url = from.url
         self.titleFull = from.titleFull
         self.weatherDisp = from.weatherDisp
+        self.rideWithGpsLink = from.rideWithGpsLink
     }
     
     func activeStatus() -> ActiveStatus {
@@ -67,12 +71,7 @@ class Ride : Identifiable, Equatable, ObservableObject  {
     }
 
     func rideUrl() -> String {
-        var id = rideId
-        if let index = id.firstIndex(of: "-") {
-            let i = rideId.distance(from: rideId.startIndex, to: index)
-            id = String(self.rideId.prefix(i))
-        }
-        let url = "https://westernwheelersbicycleclub.wildapricot.org/event-\(id)"
+        let url = "https://westernwheelersbicycleclub.wildapricot.org/event-\(eventId)"
         return url
     }
     

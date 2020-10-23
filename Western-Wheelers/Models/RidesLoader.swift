@@ -63,7 +63,7 @@ extension RidesLoader: XMLParserDelegate {
                             ride_id += "\(ch)"
                         }
                     }
-                    new_ride.rideId = ride_id
+                    //new_ride.rideId = ride_id
                 }
             }
         }
@@ -95,7 +95,7 @@ extension RidesLoader: XMLParserDelegate {
             let formatter = DateFormatter() // this formats the day,time according to users local timezone
             formatter.dateFormat = "EEEE MMM d"
             let rideDate = formatter.string(from: ride.dateTime)
-            ride.rideId = rideDate + "-" + ride.rideId
+            //ride.rideId = rideDate + "-" + ride.rideId
 
             return true
         }

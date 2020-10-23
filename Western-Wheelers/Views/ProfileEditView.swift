@@ -152,7 +152,8 @@ struct ProfileEditView: View {
     @State var alertType:AlertType = .none
     
     @State var showCameraSheet = false
-    @State var test = ""
+    //@State var test = ""
+    @State var userInfo = ""
     
     //needed to dismiss keyboard - UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
 
@@ -299,17 +300,16 @@ struct ProfileEditView: View {
                     Spacer()
                 }
                 VStack {
-                    //'[general] Connection to daemon was invalidated' occurs even in the simplest example using TextField when view is a .sheet
-                    MultilineTextField("", textIn: UserModel.userModel.currentUser!.info ?? ""
-                               ,onFocus: {
-                                   self.infoInFocus = true
-                               }
-                               ,onDone: {
-                                    //seems to be nevr called?
-                                    self.infoInFocus = false
-                               },
-                               user: UserModel.userModel.currentUser!
-                    )
+                    UITextViewWrapper(text: self.$userInfo,
+                        onFocus: {
+                            self.infoInFocus = true
+                        },
+                        onDone: {
+                            self.infoInFocus = false
+                            if let user = UserModel.userModel.currentUser {
+                                user.info = self.userInfo
+                            }
+                        })
                     .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.gray))
                 }
 
@@ -379,7 +379,7 @@ struct ProfileEditView: View {
                     primaryButton: .destructive(Text("Delete")) {
                         UserModel.userModel.currentUser!.info = nil
                         UserModel.userModel.currentUser!.picture = nil
-                        UserModel.userModel.currentUser!.joinedRideID = nil
+                        UserModel.userModel.currentUser!.joinedRideEventId = nil
                         UserModel.userModel.currentUser!.joinedRideLevel = nil
                         UserModel.userModel.currentUser!.deleteProfile()
                         //can keep local email, name etc to save them signing into WW again
@@ -419,6 +419,7 @@ struct ProfileEditView: View {
             self.queryRunning = false
             if let user = searchedUser {
                 UserModel.userModel.setCurrentUser(user: user)
+                self.userInfo = user.info ?? ""
             }
         }
             

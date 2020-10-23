@@ -100,7 +100,7 @@ class RidersTracker : ObservableObject {
         guard let ride = self.tracking_ride else {
             return
         }
-        let filter = "ride_id = \"\(ride.rideId)\""
+        let filter = ""//ride_id = \"\(ride.rideId)\""
         let pred = NSPredicate(format: filter)
         let query = CKQuery(recordType: "Riders", predicate: pred)
         self.last_query_rider_ids = []
@@ -108,7 +108,7 @@ class RidersTracker : ObservableObject {
         let operation = CKQueryOperation(query: query)
         operation.desiredKeys = ["ride_id", "rider_id", "loc_latitude", "loc_longitude", "loc_last_update", "name_first", "name_last", "user_message"]
         operation.resultsLimit = 400
-        //operation.queuePriority = .VeryHigh
+        operation.queuePriority = .veryHigh
         operation.qualityOfService = .userInteractive
         
         operation.recordFetchedBlock = { record in
