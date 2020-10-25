@@ -97,9 +97,6 @@ class RidersTracker : ObservableObject {
     }
     
     private func query_remote(ride: Ride) {
-        guard let ride = self.tracking_ride else {
-            return
-        }
         let filter = ""//ride_id = \"\(ride.rideId)\""
         let pred = NSPredicate(format: filter)
         let query = CKQuery(recordType: "Riders", predicate: pred)

@@ -76,7 +76,6 @@ class WAApi : ObservableObject {
                         url = "https://api.wildapricot.org/publicview/v1/accounts/\(id)/events"
                         //A past date returns only future evetns. A future date shows all events after that date
                         //url = url + "?%24filter=StartDate%20gt%202020-01-01" //TODO.
-                        //print ("URL=", url)
                         apiCall(path: url, withToken: true, usrMsg: usrMsg, completion: parseRides, apiType: apiType, tellUsers: tellUsers)
                     }
                     if apiType == ApiType.AuthenticateUser {

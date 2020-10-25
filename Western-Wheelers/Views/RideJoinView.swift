@@ -59,7 +59,12 @@ class JoinModel: ObservableObject {
 struct RideJoinView: View {
     @Binding var onRideFilterOn:Bool
     @ObservedObject var joinModel = JoinModel()
-    
+    @Environment(\.colorScheme) var colorScheme
+
+    func isDark() -> Bool {
+        return colorScheme == .dark
+    }
+
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     
     @State var appearCount = 0
@@ -99,16 +104,21 @@ struct RideJoinView: View {
     }
     
     func rideColor(ride:Ride) -> Color {
-        let status = ride.activeStatus()
-        if status == Ride.ActiveStatus.RecentlyClosed {
-            return Color .gray
+        if self.isDark() {
+            return Color.white
         }
         else {
-            if status == Ride.ActiveStatus.Active {
-                return Color .blue
+            let status = ride.activeStatus()
+            if status == Ride.ActiveStatus.RecentlyClosed {
+                return Color .gray
             }
             else {
-                return Color .black
+                if status == Ride.ActiveStatus.Active {
+                    return Color .blue
+                }
+                else {
+                    return Color .black
+                }
             }
         }
     }

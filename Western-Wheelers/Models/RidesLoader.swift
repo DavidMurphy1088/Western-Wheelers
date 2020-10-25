@@ -49,7 +49,7 @@ extension RidesLoader: XMLParserDelegate {
         }
         
         if elementName == "guid" {
-            if let new_ride = current_ride {
+            //if let new_ride = current_ride {
                 if let ride_guid = current_value {
                     //new_ride.rideUrl = ride_guid
                     var ride_id = ""
@@ -65,7 +65,7 @@ extension RidesLoader: XMLParserDelegate {
                     }
                     //new_ride.rideId = ride_id
                 }
-            }
+            //}
         }
         
         func validate_and_prepare_ride(ride: Ride) -> Bool {
@@ -94,7 +94,7 @@ extension RidesLoader: XMLParserDelegate {
 
             let formatter = DateFormatter() // this formats the day,time according to users local timezone
             formatter.dateFormat = "EEEE MMM d"
-            let rideDate = formatter.string(from: ride.dateTime)
+            //let rideDate = formatter.string(from: ride.dateTime)
             //ride.rideId = rideDate + "-" + ride.rideId
 
             return true

@@ -286,7 +286,7 @@ struct ProfileEditView: View {
                             }
                         }
                     }
-                    Text("When not riding with Western Wheelers, what are you other interests?")
+                    Text("Narrative for your profile. For example, when not riding, what are your other interests?")
                         //.foregroundColor(.blue)
                         .font(.footnote)
                         .padding()

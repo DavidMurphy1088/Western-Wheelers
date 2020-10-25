@@ -68,13 +68,13 @@ class Rides : ObservableObject {
         loadRideWithGps(rides: rideList, index: 0)
     }
     
-    func loadNextPage(ride:Ride) -> Bool {
+    func rideInRange(ride:Ride) -> Bool {
         var loadNext = false
         var days = 0.0
         let seconds = 0 - Date().timeIntervalSince(ride.dateTime)
         let hours = seconds / (60.0 * 60.0)
         days = hours / (24.0)
-        if days < 10 {
+        if days < 15 {
             loadNext = true
         }
         return loadNext
@@ -98,8 +98,7 @@ class Rides : ObservableObject {
         let request = URLRequest(url: url)
         
         //search ride page for a RideWithGps link
-        if loadNextPage(ride: ride) {
-            //sleep(1)
+        if rideInRange(ride: ride) {
             pagesLoaded += 1
             DispatchQueue.global(qos: .background).async {
                 URLSession.shared.dataTask(with: request) { data, response, error in
@@ -121,7 +120,6 @@ class Rides : ObservableObject {
                                         let link = "\(linkSearch)/\(id)"
                                         ride.rideWithGpsLink = link
                                         DispatchQueue.main.async {
-                                            //self.rides[index] = newRide
                                             self.ridesListSubject.send(self.rides)
                                         }
                                         self.rideWithGPSlinkMap[ride.eventId] = link
