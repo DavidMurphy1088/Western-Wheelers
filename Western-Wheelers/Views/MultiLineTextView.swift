@@ -55,7 +55,10 @@ struct UITextViewWrapper: UIViewRepresentable {
             //after user types character
             text.wrappedValue = uiView.text
         }
-        
+        func textViewShouldEndEditing(_ uiView: UITextView) {
+            //after user leaves field
+            onDone!()
+        }
         func textViewDidEndEditing(_ uiView: UITextView) {
             //after user leaves field
             onDone!()

@@ -175,6 +175,7 @@ class WAApi : ObservableObject {
         }
         
         var filteredRides:[Ride] = []
+        print ("CNT", rideList.count)
         for ride in rideList {
             if ride.activeStatus() != Ride.ActiveStatus.Past && ride.activeStatus() != Ride.ActiveStatus.RecentlyClosed {
                 filteredRides.append(ride)

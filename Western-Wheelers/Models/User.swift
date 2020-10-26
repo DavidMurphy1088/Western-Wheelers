@@ -60,15 +60,14 @@ class UserModel : ObservableObject {
         // specify the zoneID from which the records should be retrieved
         queryOperation.desiredKeys = ["email", "name_last", "name_first", "ride_joined_id", "ride_joined_session", "ride_joined_level", "ride_joined_date"]
         queryOperation.queuePriority = .veryHigh
-
+        queryOperation.qualityOfService = .userInteractive
+        
         if warmup {
             //pre-fetch on Cloudkit to make subsequent queries faster - maybe?
-            queryOperation.recordFetchedBlock = {record in
-                //if self.currentUser != nil {
-                let user = User(record: record)
-                self.fetchUser(recordId: user.recordId!, notify: false)
-                //}
-            }
+//            queryOperation.recordFetchedBlock = {record in
+//                let user = User(record: record)
+//                self.fetchUser(recordId: user.recordId!, notify: false)
+//            }
         } else {
             queryOperation.recordFetchedBlock = {record in
                 listAll.append(User(record: record))
@@ -79,9 +78,6 @@ class UserModel : ObservableObject {
             queryOperation.completionBlock = {
                 self.notifyAllLoaded(loaded: listAll)
             }
-        }
-        
-        if !warmup {
             queryOperation.queryCompletionBlock = { [weak self] (cursor : CKQueryOperation.Cursor?, error : Error?) -> Void in
                 // Continue if there are no errors
                 guard error == nil else {
@@ -95,6 +91,9 @@ class UserModel : ObservableObject {
                 }
                 // Add another operation to fetch remaining records using cursor
                 let nextOperation = CKQueryOperation(cursor: cursor!)
+                nextOperation.queuePriority = .veryHigh
+                nextOperation.qualityOfService = .userInteractive
+
                 nextOperation.recordFetchedBlock = {record in
                     listAll.append(User(record: record))
                 }
@@ -131,24 +130,31 @@ class UserModel : ObservableObject {
         }
         CKContainer.default().publicCloudDatabase.add(operation)
     }
-    
+        
     func fetchUser(recordId : CKRecord.ID, notify:Bool = true) {
-        CKContainer.default().publicCloudDatabase.fetch(withRecordID: recordId) { /*[unowned self]*/ record, error in
-            if let _ = error {
+        let fetchOperation = CKFetchRecordsOperation(recordIDs: [recordId])
+        fetchOperation.queuePriority = .veryHigh
+        fetchOperation.qualityOfService = .userInteractive
+        fetchOperation.perRecordCompletionBlock = { (record: CKRecord?, recordID: CKRecord.ID?, error: Error?) -> Void in
+            // Continue if there are no errors
+            guard error == nil else {
                 DispatchQueue.main.async {
                     Util.app().reportError(class_type: type(of: self), context: "Cannot fetch user record", error: error?.localizedDescription ?? "")
                 }
-            } else {
-                if let record = record {
-                    if notify {
-                        DispatchQueue.main.async {
-                            self.fetchedIDUser = User(record: record)
-                        }
+                return
+            }
+            // Process the record fetched
+            if let record = record {
+                if notify {
+                    DispatchQueue.main.async {
+                        self.fetchedIDUser = User(record: record)
                     }
                 }
             }
         }
+        CKContainer.default().publicCloudDatabase.add(fetchOperation)
     }
+
     
     func searchUserByEmail(email: String) {
         var queryUser:User? = nil
@@ -387,22 +393,43 @@ class User : ObservableObject, Identifiable {
             try? data.write(to: fileURL!)
             ck_record["picture"] = CKAsset(fileURL: fileURL!)
         }
+        
+        let op = CKModifyRecordsOperation(recordsToSave: [ck_record], recordIDsToDelete: [])
+        op.queuePriority = .veryHigh
+        op.qualityOfService = .userInteractive
 
-        CKContainer.default().publicCloudDatabase.save(ck_record) { (record, err) in
-            if let err = err {
-                Util.app().reportError(class_type: type(of: self), context: "cannot save user", error: err.localizedDescription)
+//        CKContainer.default().publicCloudDatabase.save(ck_record) { (record, err) in
+//            if let err = err {
+//                Util.app().reportError(class_type: type(of: self), context: "cannot save user", error: err.localizedDescription)
+//                return
+//            }
+//            guard let record = record else {
+//                Util.app().reportError(class_type: type(of: self), context: "add user, nil record", error: err?.localizedDescription)
+//                return
+//            }
+//            guard (record["email"] as? String) != nil else {
+//                Util.app().reportError(class_type: type(of: self), context: "add user but no email stored", error: err?.localizedDescription)
+//                return
+//            }
+//            completion(record.recordID)
+//        }
+        op.modifyRecordsCompletionBlock = { savedRecords, deletedRecordIDs, error in
+            if error != nil || savedRecords == nil || savedRecords?.count != 1 {
+                Util.app().reportError(class_type: type(of: self), context: "Cannot add user record", error: error?.localizedDescription ?? "")
                 return
             }
-            guard let record = record else {
-                Util.app().reportError(class_type: type(of: self), context: "add user, nil record", error: err?.localizedDescription)
+            guard let records = savedRecords else {
+                Util.app().reportError(class_type: type(of: self), context: "add user, nil record")
                 return
             }
+            let record = records[0]
             guard (record["email"] as? String) != nil else {
-                Util.app().reportError(class_type: type(of: self), context: "add user but no email stored", error: err?.localizedDescription)
+                Util.app().reportError(class_type: type(of: self), context: "add user but no email stored")
                 return
             }
             completion(record.recordID)
         }
+        CKContainer.default().publicCloudDatabase.add(op)
     }
 
     public func remoteModify(completion: @escaping () -> Void) {
@@ -450,6 +477,8 @@ class User : ObservableObject, Identifiable {
         }
         
         let op = CKModifyRecordsOperation(recordsToSave: [ck_record], recordIDsToDelete: [])
+        op.queuePriority = .veryHigh
+        op.qualityOfService = .userInteractive
         op.savePolicy = .allKeys  //2 hours later ... required otherwise it does NOTHING :( :(
         op.modifyRecordsCompletionBlock = { savedRecords, deletedRecordIDs, error in
             if error != nil || savedRecords?.count != 1 {
@@ -464,6 +493,8 @@ class User : ObservableObject, Identifiable {
     
     private func remoteDelete(completion: @escaping () -> Void) {
         let op = CKModifyRecordsOperation(recordsToSave: [], recordIDsToDelete: [self.recordId!])
+        op.queuePriority = .veryHigh
+        op.qualityOfService = .userInteractive
         op.savePolicy = .allKeys  //2 hours later ... required otherwwise it does NOTHING :( :(
         op.modifyRecordsCompletionBlock = { savedRecords, deletedRecordIDs, error in
             if error != nil || deletedRecordIDs?.count != 1 {
