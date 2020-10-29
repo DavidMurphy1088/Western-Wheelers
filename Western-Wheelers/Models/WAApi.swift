@@ -75,7 +75,8 @@ class WAApi : ObservableObject {
                     if apiType == ApiType.LoadRides {
                         url = "https://api.wildapricot.org/publicview/v1/accounts/\(id)/events"
                         //A past date returns only future evetns. A future date shows all events after that date
-                        //url = url + "?%24filter=StartDate%20gt%202020-01-01" //TODO.
+                        //url = url + "?%24filter=StartDate%20gt%202020-08-31" //TODO 2020-Oct-28 WA finally acknowledged this is broken
+                        print (url)
                         apiCall(path: url, withToken: true, usrMsg: usrMsg, completion: parseRides, apiType: apiType, tellUsers: tellUsers)
                     }
                     if apiType == ApiType.AuthenticateUser {
@@ -175,7 +176,6 @@ class WAApi : ObservableObject {
         }
         
         var filteredRides:[Ride] = []
-        print ("CNT", rideList.count)
         for ride in rideList {
             if ride.activeStatus() != Ride.ActiveStatus.Past && ride.activeStatus() != Ride.ActiveStatus.RecentlyClosed {
                 filteredRides.append(ride)
@@ -204,6 +204,7 @@ class WAApi : ObservableObject {
 //        for ride in sortedRides {
 //            print ("Date", ride.dateTime, ride.rideUrl())
 //        }
+        print ("Ride count:", sortedRides.count, ", First event[", sortedRides[0].dateTime, "], Last event[", sortedRides[sortedRides.count-1].dateTime,"]")
         Rides.instance().setRideList(rideList: sortedRides)
     }
 

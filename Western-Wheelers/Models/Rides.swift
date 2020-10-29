@@ -65,6 +65,7 @@ class Rides : ObservableObject {
             self.ridesListSubject.send(rideList)
         }
         pagesLoaded = 0
+        print("Start loading pages for RWGPS")
         loadRideWithGps(rides: rideList, index: 0)
     }
     
@@ -131,6 +132,9 @@ class Rides : ObservableObject {
                     if index < rides.count - 1 {
                         self.loadRideWithGps(rides: rides, index: index+1)
                     }
+                    else {
+                        print ("= DONE RWGPS ")
+                    }
                 }
                 .resume()
             }
@@ -138,6 +142,9 @@ class Rides : ObservableObject {
         else {
             if index < rides.count - 1 {
                 self.loadRideWithGps(rides: rides, index: index+1)
+            }
+            else {
+                print ("= DONE RWGPS ")
             }
         }
     }
@@ -158,16 +165,7 @@ class Rides : ObservableObject {
         WAApi.instance().loadRides()
         weatherLoader.load()
     }
-    
-//    func getRidesByRideId(rid: String) -> Ride? {
-//        for ride in rides {
-//            if ride.rideId == rid {
-//                return ride
-//            }
-//        }
-//        return nil
-//    }
-    
+        
     // apply weather date for the ride's day if we have weather details
     func applyWeather(rideList:[Ride]) {
         var weather_dates = Array(weatherDayData.keys)

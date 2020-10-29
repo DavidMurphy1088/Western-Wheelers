@@ -232,7 +232,7 @@ struct PeopleListView: View {
                             }
                             .padding()
                             .disabled(userModel.currentUser == nil)
-
+                            
                             NavigationLink(destination: RideJoinView(
                                             onRideFilterOn: $onMyRide,
                                             joinedEvent: UserModel.userModel.currentUser?.joinedRideEventId,

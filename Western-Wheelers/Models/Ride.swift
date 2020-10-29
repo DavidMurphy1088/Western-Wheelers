@@ -140,16 +140,7 @@ class Ride : Identifiable, Equatable, ObservableObject  {
             type = type_in
         }
     }
-    
-    func htmlLoad() {
-        if htmlDetailWasLoaded {
-            return
-        }
-        DispatchQueue.global().async {
-            self.htmlParse()
-        }
-    }
-    
+        
     func htmlAnalyse() {
         DispatchQueue.main.async { // publishing cannot come from background thread
             self.htmlDetailWasLoaded = true

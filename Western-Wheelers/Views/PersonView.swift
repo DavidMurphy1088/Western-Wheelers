@@ -40,12 +40,17 @@ struct PersonView: View {
         return trim.count
     }
     
-    func textHeight(geoHeight:CGFloat, textLen:Int) -> CGFloat {
-        if textLen < 30 {
-            return 0.1 * geoHeight
+    func textHeight(geoHeight:CGFloat, textLen:Int, imgExists:Bool) -> CGFloat {
+        if imgExists {
+            if textLen < 30 {
+                return 0.1 * geoHeight
+            }
+            else {
+                return 0.3 * geoHeight
+            }
         }
         else {
-            return 0.3 * geoHeight
+            return 0.9 * geoHeight
         }
     }
 
@@ -72,13 +77,13 @@ struct PersonView: View {
                                 Text(self.userForView!.info ?? "")
                                     .padding(.horizontal)
                             }
-                            .frame(height: self.textHeight(geoHeight: geometry.size.height, textLen: self.textLen(text: self.userForView?.info)))
+                            .frame(height: self.textHeight(geoHeight: geometry.size.height, textLen: self.textLen(text: self.userForView?.info),
+                                                           imgExists: self.userForView!.picture != nil))
                         //}
                     }
                     else {
-                        VStack {
-                            ActivityIndicator().frame(width: 50, height: 50)
-                        }.foregroundColor(Color.blue)
+                        ActivityIndicator().frame(width: 50, height: 50)
+                        .foregroundColor(Color.blue)
                     }
                 }
             }
@@ -86,7 +91,7 @@ struct PersonView: View {
         .navigationBarTitle(Text("\(self.userForView?.nameFirst ?? "") \(self.userForView?.nameLast ?? "")"), displayMode: .inline)
         .onAppear() {
             self.userForView = nil
-            self.model.fetchUser(recordId: self.recordId)
+            self.model.getUserById(recordId: self.recordId)
         }
         .onReceive(UserModel.userModel.$fetchedIDUser) {fetchedUser in
             if fetchedUser != nil {

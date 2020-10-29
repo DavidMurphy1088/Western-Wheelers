@@ -139,6 +139,10 @@ struct RideSetView: View {
                         }
                         .foregroundColor(.blue)
                 }
+                if ride.activeStatus() == Ride.ActiveStatus.Active {
+                    Text("Ride is underway")
+                }
+
             }
             .font(.system(size: 14.0))
         }
@@ -154,9 +158,6 @@ struct RideSetView: View {
                             VStack(alignment: HorizontalAlignment.leading) {
                                 RideHeader(ride: ride)
                                 RideDetails(ride: ride)
-                                if ride.activeStatus() == Ride.ActiveStatus.Active {
-                                    Text("Ride is underway")
-                                }
                             }
                             .foregroundColor(self.rideFontColor(ride: ride))
                         }

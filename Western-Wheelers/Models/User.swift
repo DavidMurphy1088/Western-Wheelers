@@ -15,9 +15,9 @@ class UserModel : ObservableObject {
     @Published private(set) var currentUser:User? = nil // created when user signs into WW, exists when apps find data in localUserModel.defaults at startup, ceases to exist when user deletes their profile
     @Published private(set) var fetchedIDUser:User? = nil
     @Published private(set) var emailSearchUser:User? = nil
-
+    private var queryStartTime: Date?
+    
     //@Published
-    //private(set) var userProfileList:[User]? = nil
     public let userProfileListSubject = PassthroughSubject<[User]?, Never>()
 
     init() {
@@ -52,7 +52,9 @@ class UserModel : ObservableObject {
 //            user.info = "my info"
 //            user.remoteAdd(completion: {id in pxrint (id)})
 //        }
-
+        print("= Load all users, warmup", warmup)
+        queryStartTime = Date()
+        
         //must use cursor since max records is ~100 on Cloudkit
         //https://gist.github.com/felixmariaa/fc7fe3ab78748793146e6450dd8e2c59#file-viewcontroller-swift
         var listAll:[User] = []
@@ -64,17 +66,26 @@ class UserModel : ObservableObject {
         
         if warmup {
             //pre-fetch on Cloudkit to make subsequent queries faster - maybe?
-//            queryOperation.recordFetchedBlock = {record in
-//                let user = User(record: record)
-//                self.fetchUser(recordId: user.recordId!, notify: false)
-//            }
+            //CKAssets (eg images) are cached locally but there is no guarantee for how long
+            //so dont cache images here since it just thrashes the small local cache,
+            //but hopefully the other (small size) fields of the user records are cached.
+            queryOperation.recordFetchedBlock = {record in
+                //let user = User(record: record)
+                //self.fetchUser(recordId: user.recordId!, notify: false)
+            }
         } else {
             queryOperation.recordFetchedBlock = {record in
                 listAll.append(User(record: record))
             }
         }
         
-        if !warmup {
+        if warmup {
+            queryOperation.queryCompletionBlock = { (cursor : CKQueryOperation.Cursor?, error : Error?) -> Void in
+                let tm = Date().timeIntervalSince1970 - self.queryStartTime!.timeIntervalSince1970
+                print("= Load all users, warmup complete. secs:", tm)
+            }
+
+        } else {
             queryOperation.completionBlock = {
                 self.notifyAllLoaded(loaded: listAll)
             }
@@ -113,10 +124,8 @@ class UserModel : ObservableObject {
         let query = CKQuery(recordType: "People", predicate: pred)
         let operation = CKQueryOperation(query: query)
         operation.desiredKeys = fields
-        //operation.resultsLimit = 1
         operation.queuePriority = .veryHigh
         operation.qualityOfService = .userInteractive //see https://developer.apple.com/library/archive/documentation/Performance/Conceptual/EnergyGuide-iOS/PrioritizeWorkWithQoS.html
-        //operation.resultsLimit = CKQueryOperation.maximumResults
         operation.recordFetchedBlock = { record in
             fetch(record)
         }
@@ -131,7 +140,7 @@ class UserModel : ObservableObject {
         CKContainer.default().publicCloudDatabase.add(operation)
     }
         
-    func fetchUser(recordId : CKRecord.ID, notify:Bool = true) {
+    func getUserById(recordId : CKRecord.ID, notify:Bool = true) {
         let fetchOperation = CKFetchRecordsOperation(recordIDs: [recordId])
         fetchOperation.queuePriority = .veryHigh
         fetchOperation.qualityOfService = .userInteractive
@@ -143,7 +152,6 @@ class UserModel : ObservableObject {
                 }
                 return
             }
-            // Process the record fetched
             if let record = record {
                 if notify {
                     DispatchQueue.main.async {
@@ -152,6 +160,7 @@ class UserModel : ObservableObject {
                 }
             }
         }
+        self.fetchedIDUser = nil
         CKContainer.default().publicCloudDatabase.add(fetchOperation)
     }
 
@@ -159,7 +168,7 @@ class UserModel : ObservableObject {
     func searchUserByEmail(email: String) {
         var queryUser:User? = nil
         let pred = NSPredicate(format: "email == %@", email)
-        self.remoteQuery(pred: pred, fields: ["email", "info", "picture", "name_last", "name_first", "ride_joined_id", "ride_joined_session", "ride_joined_level", "ride_joined_date"],
+        self.remoteQuery(pred: pred, fields: ["email", "info", "picture", "name_last", "name_first", "ride_joined_id", "ride_joined_session", "ride_joined_level"],
         fetch: {record in
             queryUser = User(record: record)
         },
@@ -190,6 +199,17 @@ class UserModel : ObservableObject {
         })
     }
     
+}
+
+extension UIImage {
+    func resized(withPercentage percentage: CGFloat, isOpaque: Bool = true) -> UIImage? {
+        let canvas = CGSize(width: size.width * percentage, height: size.height * percentage)
+        let format = imageRendererFormat
+        format.opaque = isOpaque
+        return UIGraphicsImageRenderer(size: canvas, format: format).image {
+            _ in draw(in: CGRect(origin: .zero, size: canvas))
+        }
+    }
 }
 
 class User : ObservableObject, Identifiable { 
@@ -261,12 +281,6 @@ class User : ObservableObject, Identifiable {
         if let data = record["info"] {
             info = data.description
         }
-        let file : CKAsset? = record["picture"]
-        if let file = file {
-            if let data = NSData(contentsOf: file.fileURL!) {
-                picture = UIImage(data: data as Data)
-            }
-        }
         if let data = record["ride_joined_id"] {
             joinedRideEventId = data.description
         }
@@ -276,9 +290,17 @@ class User : ObservableObject, Identifiable {
         if let data = record["ride_joined_level"] {
             joinedRideLevel = data.description
         }
-        //if let data = record["ride_joined_date"] {
-            //joinedRideDate = data.description
-        //}
+        
+        let image : CKAsset? = record["picture"]
+        if let image = image {
+            if let imageURL = image.fileURL {
+                if let data = NSData(contentsOf: imageURL) {
+                    picture = UIImage(data: data as Data)
+                    //let data1 = picture!.jpegData(compressionQuality: 1.0)
+                    //picture = picture!.resized(withPercentage: 1.0)
+                }
+            }
+        }
     }
     
     init(user:User) {
@@ -375,44 +397,23 @@ class User : ObservableObject, Identifiable {
             os_log("attempt to add nil user", log: Log.User, type: .error, "")
             return
         }
-        let ck_record = CKRecord(recordType: "People")
-        ck_record["email"] = email as CKRecordValue
+        let ckRecord = CKRecord(recordType: "People")
+        ckRecord["email"] = email as CKRecordValue
         if let name = self.nameFirst {
-            ck_record["name_first"] = name as CKRecordValue
+            ckRecord["name_first"] = name as CKRecordValue
         }
         if let name = self.nameLast {
-            ck_record["name_last"] = name as CKRecordValue
+            ckRecord["name_last"] = name as CKRecordValue
         }
         if let info = self.info {
-            ck_record["info"] = info as CKRecordValue
+            ckRecord["info"] = info as CKRecordValue
         }
-        // cannot find any other way other than to construct the asset from a file
-        // user jpeg, not png since png looses the orientation
-        if let pic = self.picture, let data = pic.jpegData(compressionQuality: 1.0) {
-            let fileURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(NSUUID().uuidString+".dat")
-            try? data.write(to: fileURL!)
-            ck_record["picture"] = CKAsset(fileURL: fileURL!)
-        }
-        
-        let op = CKModifyRecordsOperation(recordsToSave: [ck_record], recordIDsToDelete: [])
+        ckRecord["picture"] = picData(img: self.picture)
+
+        let op = CKModifyRecordsOperation(recordsToSave: [ckRecord], recordIDsToDelete: [])
         op.queuePriority = .veryHigh
         op.qualityOfService = .userInteractive
 
-//        CKContainer.default().publicCloudDatabase.save(ck_record) { (record, err) in
-//            if let err = err {
-//                Util.app().reportError(class_type: type(of: self), context: "cannot save user", error: err.localizedDescription)
-//                return
-//            }
-//            guard let record = record else {
-//                Util.app().reportError(class_type: type(of: self), context: "add user, nil record", error: err?.localizedDescription)
-//                return
-//            }
-//            guard (record["email"] as? String) != nil else {
-//                Util.app().reportError(class_type: type(of: self), context: "add user but no email stored", error: err?.localizedDescription)
-//                return
-//            }
-//            completion(record.recordID)
-//        }
         op.modifyRecordsCompletionBlock = { savedRecords, deletedRecordIDs, error in
             if error != nil || savedRecords == nil || savedRecords?.count != 1 {
                 Util.app().reportError(class_type: type(of: self), context: "Cannot add user record", error: error?.localizedDescription ?? "")
@@ -431,52 +432,68 @@ class User : ObservableObject, Identifiable {
         }
         CKContainer.default().publicCloudDatabase.add(op)
     }
-
+    
+    private func picData(img : UIImage?) -> CKAsset? {
+        guard let img = img else {
+            return nil
+        }
+        // cannot find any other way other than to construct the asset from a file
+        // user jpeg, not png since png looses the orientation
+        let imgData = img.jpegData(compressionQuality: 1.0)
+        guard var data = imgData else {
+            return nil
+        }
+        let orgSizeBytes = data.count
+        var compRatio = 1.0
+        let maxSizeBytes = 512 * 1024
+        if orgSizeBytes > maxSizeBytes {
+            compRatio = Double(maxSizeBytes) / Double(orgSizeBytes)
+            data = img.jpegData(compressionQuality: CGFloat(compRatio))!
+        }
+        print("==> Image full size1", orgSizeBytes, "rat", compRatio)
+        let fileURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(NSUUID().uuidString+".dat")
+        try? data.write(to: fileURL!)
+        print("==> Image comp size2", data.count)
+        return CKAsset(fileURL: fileURL!)
+    }
+    
     public func remoteModify(completion: @escaping () -> Void) {
         guard let email = email else {
             os_log("attempt to modify nil user", log: Log.User, type: .error, "")
             return
         }
-        let ck_record = CKRecord(recordType: "People", recordID: self.recordId!)
-        ck_record["email"] = email as CKRecordValue
+        let ckRecord = CKRecord(recordType: "People", recordID: self.recordId!)
+        ckRecord["email"] = email as CKRecordValue
         if let data = self.nameFirst {
-            ck_record["name_first"] = data as CKRecordValue
+            ckRecord["name_first"] = data as CKRecordValue
         }
         if let data = self.nameLast {
-            ck_record["name_last"] = data as CKRecordValue
+            ckRecord["name_last"] = data as CKRecordValue
         }
         if let data = self.info {
-            ck_record["info"] = data as CKRecordValue
+            ckRecord["info"] = data as CKRecordValue
         }
         if let data = self.joinedRideEventId {
-            ck_record["ride_joined_id"] = data as CKRecordValue
-            ck_record["ride_joined_session"] = self.joinedRideSessionId
+            ckRecord["ride_joined_id"] = data as CKRecordValue
+            ckRecord["ride_joined_session"] = self.joinedRideSessionId
         }
         else {
-            ck_record["ride_joined_id"] = ""
-            ck_record["ride_joined_session"] = 0
+            ckRecord["ride_joined_id"] = ""
+            ckRecord["ride_joined_session"] = 0
         }
         if let data = self.joinedRideLevel {
-            ck_record["ride_joined_level"] = data as CKRecordValue
+            ckRecord["ride_joined_level"] = data as CKRecordValue
         }
         else {
-            ck_record["ride_joined_level"] = ""
+            ckRecord["ride_joined_level"] = ""
         }
         if let data = self.joinedRideDate{
-            ck_record["ride_joined_date"] = data as CKRecordValue
+            ckRecord["ride_joined_date"] = data as CKRecordValue
         }
 
-        // user jpeg, not png since png looses the orientation
-        if let pic = self.picture, let data = pic.jpegData(compressionQuality: 1.0) {
-            let fileURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(NSUUID().uuidString+".dat")
-            try? data.write(to: fileURL!)
-            ck_record["picture"] = CKAsset(fileURL: fileURL!)
-        }
-        else {
-            ck_record["picture"] = nil
-        }
+        ckRecord["picture"] = picData(img: self.picture)
         
-        let op = CKModifyRecordsOperation(recordsToSave: [ck_record], recordIDsToDelete: [])
+        let op = CKModifyRecordsOperation(recordsToSave: [ckRecord], recordIDsToDelete: [])
         op.queuePriority = .veryHigh
         op.qualityOfService = .userInteractive
         op.savePolicy = .allKeys  //2 hours later ... required otherwise it does NOTHING :( :(
@@ -515,18 +532,7 @@ class User : ObservableObject, Identifiable {
             //self.location_message = "" //not nil since nil does not update remote
         })
     }
-    
-    func joinRide(ride: Ride) {
-        // only create a server record when user joins a ride, otherwise no need
-        //??? if the local storage has a remote_id then we know the user exists on the server
-        //joinedRideID = ride
-        joinedRideDate = Date()
-        //locationUpdateCount = 0
-        //saveLocalRideState(ride: joined_ride)
-        CloudKitManager.manager.loadGlobalSettings()
-        //DispatchQueue.global().asyncAfter(deadline: DispatchTime.now() + .seconds(10)) {
-    }
-    
+        
     func leaveRide(left_ride: Ride) {
         self.joinedRideEventId = nil
         self.joinedRideSessionId = 0
