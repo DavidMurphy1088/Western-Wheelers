@@ -18,13 +18,12 @@ class LeaderStatsLoader: ObservableObject {
         }
     }
     
-    public func loadStats() {
+    public func loadStats(year_for_stats: Int) {
         let fmt = DateFormatter()
         fmt.dateFormat = "yy"
-        let year = fmt.string(from: Date())
-        
-        let url_str = "http://www.westernwheelers.org/main/stats/20\(year)/wwstat\(year)leader1.htm"
-
+        let year_century_str = String(year_for_stats)
+        let year_str = String(year_century_str.suffix(2))
+        let url_str = "http://www.westernwheelers.org/main/stats/\(year_century_str)/wwstat\(year_str)leader1.htm"
         let requestUrl = URL(string: url_str)
         var request = URLRequest(url: requestUrl!)
         request.httpMethod = "GET"
@@ -81,9 +80,14 @@ class LeaderStatsLoader: ObservableObject {
                         self.notifyObservers(count: count)
                     }
                     else {
-                        self.notifyObservers(context: "zero rows of leader stats")
+                        if (year_for_stats == Calendar.current.component(.year, from: Date())) {
+                            self.loadStats(year_for_stats: year_for_stats-1)
+                        }
+                        else {
+                            let msg = "zero rows of leader stats"
+                            self.notifyObservers(count: nil, context: msg)
+                        }
                     }
-
                 } catch Exception.Error( _, let message) {
                     self.notifyObservers(context: message)
                 }

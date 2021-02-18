@@ -31,7 +31,7 @@ class RidersStats : ObservableObject {
                 self.published_sorted = self.stats_by_rider.count
             }
         })
-        StatsLoader.instance.loadStats()
+        StatsLoader.instance.loadStats(year_for_stats: Calendar.current.component(.year, from: Date()))
     }
     
     func sort(by_column:Int) {

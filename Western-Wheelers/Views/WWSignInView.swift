@@ -64,7 +64,7 @@ struct WWSignInView: View {
             }
         }
         .actionSheet(isPresented: $failedSigin) {
-            ActionSheet(title: Text("Cannot sign in, \(self.api.errMsg)"))
+            ActionSheet(title: Text("Cannot sign in, \(self.api.errMsg ?? "")"))
         }
         .padding(.bottom, self.keyboardHeight)
         .onReceive(Publishers.keyboardHeight) {

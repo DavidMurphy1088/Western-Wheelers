@@ -450,10 +450,8 @@ class User : ObservableObject, Identifiable {
             compRatio = Double(maxSizeBytes) / Double(orgSizeBytes)
             data = img.jpegData(compressionQuality: CGFloat(compRatio))!
         }
-        print("==> Image full size1", orgSizeBytes, "rat", compRatio)
         let fileURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(NSUUID().uuidString+".dat")
         try? data.write(to: fileURL!)
-        print("==> Image comp size2", data.count)
         return CKAsset(fileURL: fileURL!)
     }
     

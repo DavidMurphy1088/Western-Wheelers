@@ -65,7 +65,7 @@ class Rides : ObservableObject {
             self.ridesListSubject.send(rideList)
         }
         pagesLoaded = 0
-        print("Start loading pages for RWGPS")
+        print("Start loading pages for RWGPS, rides count:", rideList.count)
         loadRideWithGps(rides: rideList, index: 0)
     }
     
@@ -83,6 +83,7 @@ class Rides : ObservableObject {
     
     func loadRideWithGps(rides:[Ride], index: Int) {
         let ride = rides[index]
+
         if self.rideWithGPSlinkMap[ride.eventId] != nil {
             ride.rideWithGpsLink = self.rideWithGPSlinkMap[ride.eventId]
             if index < rides.count - 1 {

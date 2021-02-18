@@ -20,12 +20,17 @@ class StatsLoader: ObservableObject {
         }
     }
     
-    public func loadStats() {
+    public func loadStats(year_for_stats: Int) {
         let fmt = DateFormatter()
         fmt.dateFormat = "yy"
-        let year = fmt.string(from: Date())
-        let url_str = "http://www.westernwheelers.org/main/stats/20\(year)/wwstat\(year).htm"
+        
+    // look back to previous year if no stats for this year yet
+        //let year = fmt.string(from: Date())
+        let year_century_str = String(year_for_stats)
+        let year_str = String(year_century_str.suffix(2))
 
+        //let url_str = "http://www.westernwheelers.org/main/stats/20\(year_str)/wwstat\(year_str).htm"
+        let url_str = "http://www.westernwheelers.org/main/stats/\(year_century_str)/wwstat\(year_str).htm"
         let requestUrl = URL(string: url_str)
         var request = URLRequest(url: requestUrl!)
         request.httpMethod = "GET"
@@ -38,7 +43,8 @@ class StatsLoader: ObservableObject {
             }
             
             if let response = response as? HTTPURLResponse {
-                if response.statusCode != 200 {
+                let status = response.statusCode
+                if status != 200 {
                     self.notifyObservers(context: "Stats web site not available")
                     return
                 }
@@ -81,8 +87,13 @@ class StatsLoader: ObservableObject {
                         self.notifyObservers(count: count, context: "load stats", error: nil)
                     }
                     else {
-                        let msg = "zero rows of rider stats"
-                        self.notifyObservers(count: nil, context: msg)
+                        if (year_for_stats == Calendar.current.component(.year, from: Date())) {
+                            self.loadStats(year_for_stats: year_for_stats-1)
+                        }
+                        else {
+                            let msg = "zero rows of rider stats"
+                            self.notifyObservers(count: nil, context: msg)
+                        }
                     }
 
                 } catch Exception.Error( _, _) {

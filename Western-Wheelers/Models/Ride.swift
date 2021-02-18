@@ -18,6 +18,7 @@ class Ride : Identifiable, Equatable, ObservableObject  {
     @Published var htmlDetailWasLoaded = false // true => ride details were loaded from the WW site
 
     var dateTime: Date = Date()          // ride must have date and this date is always GMT. This date is the ride date AND start time
+    var timeWasSpecified: Bool = true   // 'time was specified' is set by the ride data back from the API call. Some rides dont have it - e.g. LDT's during COVID
     var url: String?
     var titleFull: String?
     var weatherDisp: String? = nil
@@ -35,6 +36,7 @@ class Ride : Identifiable, Equatable, ObservableObject  {
         self.sessionId = from.sessionId
         self.htmlDetailWasLoaded = from.htmlDetailWasLoaded
         self.dateTime = from.dateTime
+        self.timeWasSpecified = from.timeWasSpecified
         self.url = from.url
         self.titleFull = from.titleFull
         self.weatherDisp = from.weatherDisp
@@ -104,6 +106,9 @@ class Ride : Identifiable, Equatable, ObservableObject  {
         let formatter = DateFormatter() // this formats the day,time according to users local timezone
         formatter.dateFormat = "EEEE MMM d"
         let dayDisp = formatter.string(from: self.dateTime)
+        if !self.timeWasSpecified {
+            return dayDisp
+        }
         
         // force 12-hour format even if they have 24 hour set on phone
         let timeFmt = "h:mm a"
@@ -111,7 +116,9 @@ class Ride : Identifiable, Equatable, ObservableObject  {
         formatter.dateFormat = timeFmt
         formatter.locale = Locale(identifier: "en_US")
         let timeDisp = formatter.string(from: self.dateTime)
-        return dayDisp + ", " + timeDisp
+        let disp = dayDisp + ", " + timeDisp
+        
+        return disp
     }
     
     func startHour() -> Int {
