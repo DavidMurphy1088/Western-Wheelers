@@ -22,6 +22,7 @@ struct RiderStatisticsView: View {
                 VStack {
                     Text("Rider Statistics").font(.title)//.foregroundColor(Color.blue)
                     Text("Year To Date")
+                    Text("(Click the column arrows to rank by that column)").font(.footnote)
 
                     VStack (alignment: .leading) {
                         HStack {

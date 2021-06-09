@@ -203,11 +203,11 @@ struct PeopleListView: View {
                             .autocapitalization(.none)
                             //.returnKeyType = .next
                         }
-                        Toggle("On My Ride", isOn: onMyRide).disabled(
-                            UserModel.userModel.currentUser == nil ||
-                            UserModel.userModel.currentUser?.joinedRideEventId == nil ||
-                            UserModel.userModel.currentUser!.joinedRideEventId == "")
-                        .frame(width: geometry.size.width * 0.5)
+//                        Toggle("On My Ride", isOn: onMyRide).disabled(
+//                            UserModel.userModel.currentUser == nil ||
+//                            UserModel.userModel.currentUser?.joinedRideEventId == nil ||
+//                            UserModel.userModel.currentUser!.joinedRideEventId == "")
+//                        .frame(width: geometry.size.width * 0.5)
                         
                         //sometimes the email search results come after the list results and so the current user show blank in the list - this attempts to fix that
                         List(self.profileListModel.profileList!, id: \.id) { user in
@@ -233,18 +233,18 @@ struct PeopleListView: View {
                             .padding()
                             .disabled(userModel.currentUser == nil)
                             
-                            NavigationLink(destination: RideJoinView(
-                                            onRideFilterOn: $onMyRide,
-                                            joinedEvent: UserModel.userModel.currentUser?.joinedRideEventId,
-                                            joinedSession: self.sessionId(user: UserModel.userModel.currentUser),
-                                            joinedRideLevel: UserModel.userModel.currentUser?.joinedRideLevel),
-                                            isActive: $showJoinRide) {
-                                
-                                Text("Join/Leave Ride")
-                            }
-                            .padding()
-                            //only enabled if user has profile
-                            .disabled(!self.userHasProfile())
+//                            NavigationLink(destination: RideJoinView(
+//                                            onRideFilterOn: $onMyRide,
+//                                            joinedEvent: UserModel.userModel.currentUser?.joinedRideEventId,
+//                                            joinedSession: self.sessionId(user: UserModel.userModel.currentUser),
+//                                            joinedRideLevel: UserModel.userModel.currentUser?.joinedRideLevel),
+//                                            isActive: $showJoinRide) {
+//                                
+//                                Text("Join/Leave Ride")
+//                            }
+//                            .padding()
+//                            //only enabled if user has profile
+//                            .disabled(!self.userHasProfile())
 
                             Button(action: {
                                 if !CloudKitManager.manager.canReadData() {

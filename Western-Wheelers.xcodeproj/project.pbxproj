@@ -21,6 +21,7 @@
 		7B510E8A252B9B4F0056F858 /* RideWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B510E89252B9B4F0056F858 /* RideWebView.swift */; };
 		7B510E95252B9BB30056F858 /* RideLevelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B510E94252B9BB30056F858 /* RideLevelsView.swift */; };
 		7B510EA4252B9BFA0056F858 /* QuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B510EA3252B9BFA0056F858 /* QuizView.swift */; };
+		7B58AFBA26703E5C008B5B7E /* Notes in Resources */ = {isa = PBXBuildFile; fileRef = 7B58AFB926703E5C008B5B7E /* Notes */; };
 		7B5DE41A252AC74C0054853B /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 7B5DE419252AC74C0054853B /* Podfile */; };
 		7B8C076B252F918100620697 /* RiderStatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8C076A252F918100620697 /* RiderStatisticsView.swift */; };
 		7BD1B36D252ACA6F003FBA2E /* RideSetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD1B36C252ACA6F003FBA2E /* RideSetView.swift */; };
@@ -98,6 +99,7 @@
 		7B510E89252B9B4F0056F858 /* RideWebView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RideWebView.swift; sourceTree = "<group>"; };
 		7B510E94252B9BB30056F858 /* RideLevelsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RideLevelsView.swift; sourceTree = "<group>"; };
 		7B510EA3252B9BFA0056F858 /* QuizView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuizView.swift; sourceTree = "<group>"; };
+		7B58AFB926703E5C008B5B7E /* Notes */ = {isa = PBXFileReference; lastKnownFileType = text; path = Notes; sourceTree = "<group>"; };
 		7B5DE419252AC74C0054853B /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		7B8C076A252F918100620697 /* RiderStatisticsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RiderStatisticsView.swift; sourceTree = "<group>"; };
 		7BD1B36C252ACA6F003FBA2E /* RideSetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RideSetView.swift; sourceTree = "<group>"; };
@@ -308,6 +310,7 @@
 				7BF39046252AC8C6001CD41E /* doc_person_info.txt */,
 				7BF39047252AC8C6001CD41E /* doc_quiz_info.txt */,
 				7BF39048252AC8C6001CD41E /* doc_ride_join.txt */,
+				7B58AFB926703E5C008B5B7E /* Notes */,
 			);
 			path = Documents;
 			sourceTree = "<group>";
@@ -439,6 +442,7 @@
 				7B5DE41A252AC74C0054853B /* Podfile in Resources */,
 				7BF39068252AC8E0001CD41E /* api_keys.txt in Resources */,
 				7BF3904A252AC8C6001CD41E /* doc_person_info.txt in Resources */,
+				7B58AFBA26703E5C008B5B7E /* Notes in Resources */,
 				7B3A41C1252AC3C10095F169 /* Assets.xcassets in Resources */,
 				7BF3904B252AC8C6001CD41E /* doc_quiz_info.txt in Resources */,
 				7BF3904C252AC8C6001CD41E /* doc_ride_join.txt in Resources */,
@@ -773,7 +777,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "Western-Wheelers/Western-Wheelers.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Western-Wheelers/Preview Content\"";
 				DEVELOPMENT_TEAM = 2B6A6N9QBQ;
 				ENABLE_PREVIEWS = YES;
@@ -783,7 +787,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.4;
+				MARKETING_VERSION = 2.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dmurphy.westernwheelers;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -799,7 +803,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "Western-Wheelers/Western-Wheelers.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Western-Wheelers/Preview Content\"";
 				DEVELOPMENT_TEAM = 2B6A6N9QBQ;
 				ENABLE_PREVIEWS = YES;
@@ -809,7 +813,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.4;
+				MARKETING_VERSION = 2.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dmurphy.westernwheelers;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

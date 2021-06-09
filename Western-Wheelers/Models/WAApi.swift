@@ -91,13 +91,16 @@ class WAApi : ObservableObject {
                         //Feb 12 2021 - making the user account admin gives the account 'events_view' perms which is now required for V2
                         //Feb 17 2021 - WA said filter applies to series start date, not event start date. So set filter to 01Jan of current year and tell
                         //WW admins not to list ride series than span and end of year.
+
                         url = "https://api.wildapricot.org/v2/accounts/\(id)/events"
-                        let startDate = Calendar.current.date(byAdding: .day, value: 0, to: Date())!
+                        //let startDate = Calendar.current.date(byAdding: .day, value: 0, to: Date())!
+                        let startDate = Calendar.current.date(byAdding: .day, value: -2, to: Date())!
                         let formatter = DateFormatter()
-                        formatter.dateFormat = "yyyy-01-01"
+                        //formatter.dateFormat = "yyyy-01-01"
+                        formatter.dateFormat = "yyyy-MM-dd"
                         let startDateStr = formatter.string(from: startDate)
+                        print("API Filter date", startDateStr)
                         url = url + "?%24filter=StartDate%20gt%20\(startDateStr)"
-                        //print ("===", url)
 
                         apiCall(path: url, withToken: true, usrMsg: usrMsg, completion: parseRides, apiType: apiType, tellUsers: tellUsers)
                     }
@@ -141,6 +144,7 @@ class WAApi : ObservableObject {
         var rideList = [Ride]()
         
         if let events = try! JSONSerialization.jsonObject(with: raw, options: []) as? [String: Any] {
+
             //dict with one entry for 'events'
             for (_, val) in events {
                 let rides = val as! NSArray
@@ -223,7 +227,7 @@ class WAApi : ObservableObject {
         
         var filteredRides:[Ride] = []
         for ride in rideList {
-            if ride.activeStatus() != Ride.ActiveStatus.Past && ride.activeStatus() != Ride.ActiveStatus.RecentlyClosed {
+            if ride.activeStatus() != Ride.ActiveStatus.Past {//} && ride.activeStatus() != Ride.ActiveStatus.RecentlyClosed {
                 filteredRides.append(ride)
             }
         }
@@ -329,3 +333,4 @@ class WAApi : ObservableObject {
         task.resume()
     }
 }
+
