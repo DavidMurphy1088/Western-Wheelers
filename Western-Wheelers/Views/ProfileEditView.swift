@@ -99,8 +99,6 @@ class UserLoginManager: UIViewController, ObservableObject  {
 
 struct ImagePicker: UIViewControllerRepresentable {
     @Environment(\.presentationMode) var presentationMode
-    //@Binding var user: User?
-    //@Binding var user: User?
     @State var par:ProfileEditView
     
     class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
@@ -152,13 +150,17 @@ struct ProfileEditView: View {
     @State var alertType:AlertType = .none
     
     @State var showCameraSheet = false
-    //@State var test = ""
     @State var userInfo = ""
     
     //needed to dismiss keyboard - UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
 
     func setImage(image:UIImage) {
-        UserModel.userModel.currentUser?.picture = image
+        let user = UserModel.userModel.currentUser
+        if let u = user {
+            //force view to refresh from observed object
+            u.picture = image
+            UserModel.userModel.setCurrentUser(user: u)
+        }
     }
     
     func turnOffOnRideFilter() {

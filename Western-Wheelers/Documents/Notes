@@ -3,3 +3,4 @@
 - removed join ride option
 - still show rides that are recently closed (previous it only showed rides still active)
 - profile edit immediatley disappera on iOS 14.6
+- changing picture does not update in profile edit fixed

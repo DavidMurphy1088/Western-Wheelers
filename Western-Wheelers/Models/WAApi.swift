@@ -93,11 +93,15 @@ class WAApi : ObservableObject {
                         //WW admins not to list ride series than span and end of year.
 
                         url = "https://api.wildapricot.org/v2/accounts/\(id)/events"
-                        //let startDate = Calendar.current.date(byAdding: .day, value: 0, to: Date())!
-                        let startDate = Calendar.current.date(byAdding: .day, value: -2, to: Date())!
                         let formatter = DateFormatter()
-                        //formatter.dateFormat = "yyyy-01-01"
-                        formatter.dateFormat = "yyyy-MM-dd"
+                        
+                        //let startDate = Calendar.current.date(byAdding: .day, value: -2, to: Date())!
+                        //The date must be Jan 01 of the current year.
+                        //The date filter causes rides in a series to be filtered by the start of their ride series date, not the rride data
+                        //formatter.dateFormat = "yyyy-MM-dd"
+                        let startDate = Calendar.current.date(byAdding: .day, value: 0, to: Date())!
+                        formatter.dateFormat = "yyyy-01-01"
+
                         let startDateStr = formatter.string(from: startDate)
                         print("API Filter date", startDateStr)
                         url = url + "?%24filter=StartDate%20gt%20\(startDateStr)"
