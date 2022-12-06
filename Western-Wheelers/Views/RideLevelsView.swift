@@ -31,7 +31,7 @@ struct RideLevelsView: View {
         if RidersStats.instance.published_total_stats != nil {
             self.info += "\nRiders stats "+String(RidersStats.instance.published_total_stats!)
         }
-        self.info += "\n\nThanks for using the Western Wheelers app and I hope you find it useful. Feel free to send any suggestions or new ideas to davidp.murphy@sbcglobal.net"
+        self.info += "\n\nThanks for using the Western Wheelers app and I hope you find it useful. Feel free to send any suggestions or new ideas to davidmurphy1088@gmail.com"
     }
 
     var body: some View {

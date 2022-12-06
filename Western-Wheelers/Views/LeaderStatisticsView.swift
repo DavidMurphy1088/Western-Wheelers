@@ -58,11 +58,15 @@ struct LeaderStatisticsView: View {
                         else {
                             List(LeadersStats.instance.stats_by_leader) {
                                 rider in
-                                Text("\(rider.name_first ?? "") \(rider.name_last ?? "")").frame(width: self.len_name, alignment: .leading)
-                                Text("\(rider.total_led)").frame(width: self.len_led, alignment:.trailing)
-                                Text("\(rider.total_coled)").frame(width: self.len_coled, alignment:.trailing)
-                                Text("\(rider.total_rides)").frame(width: self.len_total, alignment:.trailing)
-                                }.font(.footnote)
+                                    HStack {
+                                        Text("\(rider.name_first ?? "") \(rider.name_last ?? "")").frame(width: self.len_name, alignment: .leading)
+                                        Text("\(rider.total_led)").frame(width: self.len_led, alignment:.trailing)
+                                        Text("\(rider.total_coled)").frame(width: self.len_coled, alignment:.trailing)
+                                        Text("\(rider.total_rides)").frame(width: self.len_total, alignment:.trailing)
+                                    }
+                                }
+                                //.font(.footnote)
+                                .listStyle(PlainListStyle())
                         }
                     }
                 }

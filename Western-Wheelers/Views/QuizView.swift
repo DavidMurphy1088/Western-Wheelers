@@ -142,8 +142,8 @@ struct QuizView: View {
                 else {
                     Text("Where is this ride?")
                     if self.ansCount == 0 {
-                        Text("Select from the scrolling")
-                        Text("list in the image below.")
+                        Text("Select from the list")
+                        Text("in the image below.")
                     }
                     ZStack {
                         //self.image_quiz!.resizable().aspectRatio(contentMode: .fit)
@@ -160,13 +160,12 @@ struct QuizView: View {
                         if self.imgNum() != nil {
                             Picker(selection: $pickSelection, label: Text("")) {
                                 ForEach(0 ..< self.quizModel.imageRecords[self.imgNum()!].answerOptions.count) { index in
-                                    //Text(self.quiz_model.image_records[self.img_num()].answer_options[index]).tag(index).foregroundColor(.white).font(.largeTitle).lineSpacing(50)
                                     Text(self.quizModel.imageRecords[self.imgNum()!].answerOptions[index]).tag(index)
                                     //.foregroundColor(.white)
-                                        .foregroundColor(Color(red: 1.0, green: 1.0, blue: 1.0))
+                                    .foregroundColor(Color(red: 1.0, green: 1.0, blue: 1.0))
                                     //.font(.headline)
                                     //.font(.largeTitle)
-                                        .font(.system(size:CGFloat(self.optionFontSize), weight: .bold, design: .default))
+                                    //.font(.system(size:CGFloat(self.optionFontSize), weight: .bold, design: .default))
                                     //.frame(minWidth: 0, maxWidth: 400, minHeight: 400, maxHeight: 400)
                                     //.background(Color.black)
                                     //.padding(.vertical, 100.0)

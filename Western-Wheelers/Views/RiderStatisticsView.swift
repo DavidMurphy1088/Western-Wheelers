@@ -20,7 +20,7 @@ struct RiderStatisticsView: View {
             }
             else {
                 VStack {
-                    Text("Rider Statistics").font(.title)//.foregroundColor(Color.blue)
+                    Text("Rider Statistics").font(.title)
                     Text("Year To Date")
                     Text("(Click the column arrows to rank by that column)").font(.footnote)
 
@@ -48,19 +48,28 @@ struct RiderStatisticsView: View {
                             }.frame(height: 5)
                         }
                         
-                        if RidersStats.instance.stats_for_me == nil {
-                            Text("      When you create your profile your stats show here").foregroundColor(Color .gray).font(.footnote)
+                        VStack {
+                            if RidersStats.instance.stats_for_me == nil {
+                                Text("      When you create your profile your own stats show here").foregroundColor(Color .gray)
+                            }
+                            else {
+                                List(RidersStats.instance.stats_for_me!) {
+                                    rider in
+                                    HStack {
+                                        Text("\(rider.name_first ?? "") \(rider.name_last ?? "")").frame(width: self.len_name, alignment: .leading)
+                                        Text("\(rider.total_miles)").frame(width: self.len_miles_total)
+                                        Text("\(rider.total_rides)").frame(width: self.len_rides_total)
+                                        Text("\(rider.feet_climbed)").frame(width: self.len_feet_total)
+                                        Text("\(rider.feet_per_mile)").frame(width: self.len_feet_per)
+
+                                    }
+                                    
+                                }
+                            }
                         }
-                        else {
-                            List(RidersStats.instance.stats_for_me!) {
-                                rider in
-                                Text("\(rider.name_first ?? "") \(rider.name_last ?? "")").frame(width: self.len_name, alignment: .leading)
-                                Text("\(rider.total_miles)").frame(width: self.len_miles_total).overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.blue, lineWidth: 1))
-                                Text("\(rider.total_rides)").frame(width: self.len_rides_total).overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.blue, lineWidth: 1))
-                                Text("\(rider.feet_climbed)").frame(width: self.len_feet_total).overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.blue, lineWidth: 1))
-                                Text("\(rider.feet_per_mile)").frame(width: self.len_feet_per).overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.blue, lineWidth: 1))
-                            }.font(.footnote).frame(height: 40).border(Color.gray)
-                        }
+                        .listStyle(PlainListStyle())
+                        .frame(height: 40).border(Color.gray)
+                        .font(.footnote)
                     
                         if RidersStats.instance.published_total_stats == nil {
                             VStack {
@@ -68,14 +77,20 @@ struct RiderStatisticsView: View {
                             }.foregroundColor(Color.blue)
                         }
                         else {
-                            List(RidersStats.instance.stats_by_rider) {
-                                rider in
-                                Text("\(rider.name_first ?? "") \(rider.name_last ?? "")").frame(width: self.len_name, alignment: .leading)
-                                Text("\(rider.total_miles)").frame(width: self.len_miles_total)
-                                Text("\(rider.total_rides)").frame(width: self.len_rides_total)
-                                Text("\(rider.feet_climbed)").frame(width: self.len_feet_total)
-                                Text("\(rider.feet_per_mile)").frame(width: self.len_feet_per)
-                            }.font(.footnote)
+                            VStack {
+                                List(RidersStats.instance.stats_by_rider) {
+                                    rider in
+                                    HStack {
+                                        Text("\(rider.name_first ?? "") \(rider.name_last ?? "")").frame(width: self.len_name, alignment: .leading)
+                                        Text("\(rider.total_miles)").frame(width: self.len_miles_total)
+                                        Text("\(rider.total_rides)").frame(width: self.len_rides_total)
+                                        Text("\(rider.feet_climbed)").frame(width: self.len_feet_total)
+                                        Text("\(rider.feet_per_mile)").frame(width: self.len_feet_per)
+                                    }
+                                    .font(.footnote)
+                                }
+                                .listStyle(PlainListStyle())
+                            }
                         }
                     }
                 }

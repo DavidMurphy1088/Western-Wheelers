@@ -15,15 +15,15 @@ struct ContentView: View {
     var contents: some View {
         TabView {
 
-//            TestView().tabItem { VStack {
-//                Text("Rides")
-//                Image("tab-icon-bike")
-//            }}//.padding().tag(1)
-
             RideLevelsView(searchActive: searchActive).tabItem { VStack {
                 Text("Rides")
                 Image("tab-icon-bike")
             }}//.padding().tag(1)
+            
+//            SignedInView().tabItem { VStack {
+//                Text("SignIn")
+//                Image("tab-icon-bike")
+//            }}
             
             PeopleListView()
             .tabItem { VStack {
