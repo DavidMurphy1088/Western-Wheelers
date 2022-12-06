@@ -49,6 +49,7 @@ struct LeaderStatisticsView: View {
                                 Button(action: {self.stats_model.sort(by_column: 4)}) {Image("col-sort-icon")}.frame(width: self.len_total, alignment: .trailing)
                             }.frame(height: 5, alignment: .leading)
                         }
+        
                         
                         if LeadersStats.instance.published_total_stats == nil {
                             VStack {
