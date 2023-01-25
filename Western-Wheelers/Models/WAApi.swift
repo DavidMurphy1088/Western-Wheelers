@@ -13,7 +13,7 @@ class WAApi : ObservableObject {
     private var token: String! = nil
     private var nameLast:String? = nil
     private var nameFirst:String? = nil
-
+    
     enum ApiType {
         case LoadRides, AuthenticateUser, None
     }
@@ -28,8 +28,10 @@ class WAApi : ObservableObject {
     
     init() {
         self.WAUser = Util.apiKey(key: "WA_username")
+        //self.WAUser = "davidm@benetech.org"
         //self.WAUser = "sample@member.wa"
         let pwd = Util.apiKey(key: "WA_pwd")
+
         self.WAPwd = pwd+pwd+pwd
     }
     
