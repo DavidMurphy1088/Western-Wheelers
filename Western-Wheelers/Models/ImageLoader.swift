@@ -2,6 +2,7 @@ import Foundation
 import Combine
 import SwiftUI
 
+
 class ImageLoader : ObservableObject {
     var image:UIImage? = nil
     @Published var dataWasLoaded = false
