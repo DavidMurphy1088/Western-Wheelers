@@ -156,6 +156,15 @@ class WAApi : ObservableObject {
                 let rides = val as! NSArray
                 for rideData in rides {
                     let rideDict = rideData as! NSDictionary
+                    if let accessLevel = rideDict["AccessLevel"] {
+                        let accessLevel = accessLevel as! String
+                        if accessLevel != "Public" {
+                            let rideName = rideDict["Name"]
+                            //print("=====AL ", accessLevel, rideName ?? "None")
+                            continue
+                        }
+                    }
+
                     let ride = Ride()
                     ride.titleFull = ""
                     //some rides have an array of sessions. Each must be listed separately in the app
@@ -213,7 +222,7 @@ class WAApi : ObservableObject {
                 }
             }
         }
-        print ("Rides count from API:", rideList.count)
+        print ("==>Rides count from API:", rideList.count)
 
         //debug api results ...
         if false {

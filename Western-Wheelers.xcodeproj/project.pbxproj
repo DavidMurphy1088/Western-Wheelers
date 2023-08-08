@@ -75,27 +75,6 @@
 			remoteGlobalIDString = 7B3A41B3252AC3C00095F169;
 			remoteInfo = "Western-Wheelers";
 		};
-		7B88AB44288F5EF700F5FEF9 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 7B88AA25288F5EF600F5FEF9 /* Pods.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = EC8F4D0BE3B0C192EBA4A93F8887D89F;
-			remoteInfo = FBSDKCoreKit;
-		};
-		7B88AB46288F5EF700F5FEF9 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 7B88AA25288F5EF600F5FEF9 /* Pods.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 5DE0FEFC3995E740EC1AE2611D0AEFB0;
-			remoteInfo = FBSDKLoginKit;
-		};
-		7B88AB48288F5EF700F5FEF9 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 7B88AA25288F5EF600F5FEF9 /* Pods.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 85128AF76199890A6DD56FE81089D883;
-			remoteInfo = FBSDKShareKit;
-		};
 		7B88AB4A288F5EF700F5FEF9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 7B88AA25288F5EF600F5FEF9 /* Pods.xcodeproj */;
@@ -1459,9 +1438,6 @@
 		7B88AA26288F5EF600F5FEF9 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				7B88AB45288F5EF700F5FEF9 /* FBSDKCoreKit.framework */,
-				7B88AB47288F5EF700F5FEF9 /* FBSDKLoginKit.framework */,
-				7B88AB49288F5EF700F5FEF9 /* FBSDKShareKit.framework */,
 				7B88AB4B288F5EF700F5FEF9 /* Pods_Western_Wheelers.framework */,
 				7B88AB4D288F5EF700F5FEF9 /* Pods_Western_Wheelers_Western_WheelersUITests.framework */,
 				7B88AB4F288F5EF700F5FEF9 /* Pods_Western_WheelersTests.framework */,
@@ -2084,30 +2060,10 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		7B88AB45288F5EF700F5FEF9 /* FBSDKCoreKit.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = FBSDKCoreKit.framework;
-			remoteRef = 7B88AB44288F5EF700F5FEF9 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		7B88AB47288F5EF700F5FEF9 /* FBSDKLoginKit.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = FBSDKLoginKit.framework;
-			remoteRef = 7B88AB46288F5EF700F5FEF9 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		7B88AB49288F5EF700F5FEF9 /* FBSDKShareKit.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = FBSDKShareKit.framework;
-			remoteRef = 7B88AB48288F5EF700F5FEF9 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		7B88AB4B288F5EF700F5FEF9 /* Pods_Western_Wheelers.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
+			name = "Pods-Western-Wheelers";
 			path = Pods_Western_Wheelers.framework;
 			remoteRef = 7B88AB4A288F5EF700F5FEF9 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -2115,6 +2071,7 @@
 		7B88AB4D288F5EF700F5FEF9 /* Pods_Western_Wheelers_Western_WheelersUITests.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
+			name = "Pods-Western-Wheelers-Western-WheelersUITests";
 			path = Pods_Western_Wheelers_Western_WheelersUITests.framework;
 			remoteRef = 7B88AB4C288F5EF700F5FEF9 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -2122,6 +2079,7 @@
 		7B88AB4F288F5EF700F5FEF9 /* Pods_Western_WheelersTests.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
+			name = "Pods-Western-WheelersTests";
 			path = Pods_Western_WheelersTests.framework;
 			remoteRef = 7B88AB4E288F5EF700F5FEF9 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -2129,6 +2087,7 @@
 		7B88AB51288F5EF700F5FEF9 /* SwiftSoup.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
+			name = SwiftSoup;
 			path = SwiftSoup.framework;
 			remoteRef = 7B88AB50288F5EF700F5FEF9 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -2487,12 +2446,12 @@
 				DEVELOPMENT_TEAM = 2B6A6N9QBQ;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "Western-Wheelers/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.6;
+				MARKETING_VERSION = 2.7;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dmurphy.westernwheelers;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -2513,12 +2472,12 @@
 				DEVELOPMENT_TEAM = 2B6A6N9QBQ;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "Western-Wheelers/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.6;
+				MARKETING_VERSION = 2.7;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dmurphy.westernwheelers;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

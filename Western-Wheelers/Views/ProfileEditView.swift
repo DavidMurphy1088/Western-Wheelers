@@ -79,7 +79,22 @@ class UserLoginManager: UIViewController, ObservableObject  {
     
     func getFBUserData(imageLoader: ImageLoader)  {
         if((AccessToken.current) != nil){
-            GraphRequest(graphPath: "me", parameters: ["fields": "id, name, first_name, last_name, picture.type(large), email"]).start(completionHandler: { (connection, result, error) -> Void in
+            let graphRequest = GraphRequest(graphPath: "me",
+                         parameters: ["fields": "id, name, first_name, last_name, picture.type(large), email"])
+                
+//            graphRequest.start(completionHandler: { (connection, result, error) -> Void in
+//                if (error == nil){
+//                    guard let userDict = result as? [String:Any] else {
+//                        return
+//                    }
+//                    if let picture = userDict["picture"] as? [String:Any] ,
+//                        let imgData = picture["data"] as? [String:Any] ,
+//                        let url = imgData["url"] as? String {
+//                        imageLoader.loadImage(url: url)
+//                    }
+//                 }
+//            })
+            graphRequest.start { (connection, result, error) in
                 if (error == nil){
                     guard let userDict = result as? [String:Any] else {
                         return
@@ -90,7 +105,8 @@ class UserLoginManager: UIViewController, ObservableObject  {
                         imageLoader.loadImage(url: url)
                     }
                  }
-            })
+            }
+
         }
     }
 }

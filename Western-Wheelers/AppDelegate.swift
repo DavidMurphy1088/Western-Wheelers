@@ -87,11 +87,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, ObservableObject {
         //establish user's remote id
         //User.user.remote_load()
 
-        // Facebook
+        //Facebook
         ApplicationDelegate.shared.application(
             application,
             didFinishLaunchingWithOptions: launchOptions
         )
+        
         CKContainer.default().accountStatus { status, error in
             if let error = error {
                 self.cloudKitStatus = error.localizedDescription
@@ -132,18 +133,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate, ObservableObject {
     }
     
     // Facebook
-    func application(
-        _ app: UIApplication,
-        open url: URL,
-        options: [UIApplication.OpenURLOptionsKey : Any] = [:]
-    ) -> Bool {
-        ApplicationDelegate.shared.application(
-            app,
-            open: url,
-            sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String,
-            annotation: options[UIApplication.OpenURLOptionsKey.annotation]
-        )
-    }
+//    func application(
+//        _ app: UIApplication,
+//        open url: URL,
+//        options: [UIApplication.OpenURLOptionsKey : Any] = [:]
+//    ) -> Bool {
+//        ApplicationDelegate.shared.application(
+//            app,
+//            open: url,
+//            sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String,
+//            annotation: options[UIApplication.OpenURLOptionsKey.annotation]
+//        )
+//    }
     
 }
 
